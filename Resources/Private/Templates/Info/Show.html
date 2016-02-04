@@ -4,5 +4,20 @@
 <f:layout name="Default"/>
 
 <f:section name="Main">
-ASD
+
+    <f:comment>
+        <form class="file-form" name="file-form" action="/server">
+            <input class="file-selector" type="file" name="file" accept="image/*">
+            <input type="submit">
+        </form>
+    </f:comment>
+
+    <div class="file-drop">
+        <div class="text">Drop file here</div>
+    </div>
+
+    <div class="progress-bar red shine">
+        <span style="width:0%"></span>
+    </div>
+
 </f:section>
