@@ -1,0 +1,57 @@
+<T3DataStructure>
+    <meta>
+        <langDisable>1</langDisable>
+    </meta>
+    <sheets>
+        <sDEF>
+            <ROOT>
+                <TCEforms>
+                    <sheetTitle>Einstellungen</sheetTitle>
+                </TCEforms>
+                <type>array</type>
+                <el>
+
+                    <settings.ws_server>
+                        <TCEforms>
+                            <exclude>0</exclude>
+                            <label>Server Host</label>
+                            <config>
+                                <type>input</type>
+                                <size>40</size>
+                                <eval>required</eval>
+                            </config>
+                        </TCEforms>
+                    </settings.ws_server>
+
+                    <settings.ws_port>
+                        <TCEforms>
+                            <exclude>0</exclude>
+                            <label>Server Port</label>
+                            <config>
+                                <type>input</type>
+                                <size>40</size>
+                                <default>9999</default>
+                                <eval>int,required</eval>
+                            </config>
+                        </TCEforms>
+                    </settings.ws_port>
+
+                    <settings.ssl_port>
+                        <TCEforms>
+                            <exclude>0</exclude>
+                            <label>Server SSL Port</label>
+                            <config>
+                                <type>input</type>
+                                <size>40</size>
+                                <default>9998</default>
+                                <eval>int,required</eval>
+                            </config>
+                        </TCEforms>
+                    </settings.ssl_port>
+
+                </el>
+            </ROOT>
+        </sDEF>
+    </sheets>
+
+</T3DataStructure>

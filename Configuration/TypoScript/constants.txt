@@ -1,0 +1,15 @@
+
+plugin.tx_bcconvert {
+	view {
+		# cat=plugin.tx_bcconvert/file; type=string; label=Path to template root (FE)
+		templateRootPath = EXT:bc_convert/Resources/Private/Templates/
+		# cat=plugin.tx_bcconvert/file; type=string; label=Path to template partials (FE)
+		partialRootPath = EXT:bc_convert/Resources/Private/Partials/
+		# cat=plugin.tx_bcconvert/file; type=string; label=Path to template layouts (FE)
+		layoutRootPath = EXT:bc_convert/Resources/Private/Layouts/
+	}
+	persistence {
+		# cat=plugin.tx_bcconvert//a; type=string; label=Default storage PID
+		storagePid =
+	}
+}

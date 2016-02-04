@@ -1,0 +1,15 @@
+
+# extension settings
+plugin.tx_bcconvert {
+	view {
+		templateRootPath = {$plugin.tx_bcconvert.view.templateRootPath}
+		partialRootPath = {$plugin.tx_bcconvert.view.partialRootPath}
+		layoutRootPath = {$plugin.tx_bcconvert.view.layoutRootPath}
+	}
+	persistence {
+		storagePid = {$plugin.tx_bcconvert.persistence.storagePid}
+	}
+    settings {
+        imageStoragePath = {$plugin.tx_bcconvert.settings.imageStoragePath}
+    }
+}
