@@ -84,12 +84,11 @@
     background-position: 60px 0;
   }
 }
-/* line 86, ../../Private/Sass/style.scss */
+/*
 .shine span {
   position: relative;
 }
 
-/* line 90, ../../Private/Sass/style.scss */
 .shine span::after {
   content: '';
   opacity: 0;
@@ -104,15 +103,8 @@
 }
 
 @keyframes animate-shine {
-  0% {
-    opacity: 0;
-    width: 0;
-  }
-  50% {
-    opacity: .5;
-  }
-  100% {
-    opacity: 0;
-    width: 95%;
-  }
+  0% {opacity: 0; width: 0;}
+  50% {opacity: .5;}
+  100% {opacity: 0; width: 95%;}
 }
+*/
