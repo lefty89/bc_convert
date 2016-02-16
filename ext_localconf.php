@@ -14,3 +14,15 @@ if (!defined('TYPO3_MODE')) {
 		'Info' => 'show',
 	)
 );
+
+\TYPO3\CMS\Extbase\Utility\ExtensionUtility::configurePlugin(
+	'BC.'.$_EXTKEY,
+	'File',
+	array(
+		'File' => 'handle, download, upload',
+	),
+	// non-cacheable actions
+	array(
+		'File' => 'handle, download, upload'
+	)
+);
