@@ -5,14 +5,7 @@
 
 <f:section name="Main">
 
-    <f:comment>
-        <form class="file-form" name="file-form" action="/server">
-            <input class="file-selector" type="file" name="file" accept="image/*">
-            <input type="submit">
-        </form>
-    </f:comment>
-
-    <div class="file-drop">
+    <div class="file-drop" data-url="{f:uri.action(action:'handle', controller:'File', pluginName:'File', pageType:'165237')}">
         <div class="text">Drop file here</div>
     </div>
 
@@ -20,4 +13,13 @@
         <span style="width:0%"></span>
     </div>
 
+    <ul>
+        <f:for each="{files}" as="file">
+            <li>
+                <f:link.action target="_blank" action="download" controller="File" pluginName="File" pageType="165237" additionalParams="{v:'{file.hash}'}">
+                    {file.name}
+                </f:link.action>
+            </li>
+        </f:for>
+    </ul>
 </f:section>
