@@ -117,8 +117,8 @@ class FileUtility {
 
 			// read first line
 			$manifestString = fgets($fp);
-			fflush($fp);
 
+			fflush($fp);
 			// close file
 			fclose($fp);
 
@@ -189,7 +189,7 @@ class FileUtility {
 		// remove the file manifest
 		if ($handle = fopen($file->getPath(), "c+")) {
 			if (flock($handle, LOCK_EX)) {
-				while (($line = fgets($handle, 4096)) !== FALSE) {
+				while (($line = fgets($handle)) !== FALSE) {
 					if (!isset($write_position)) {
 						$write_position = 0;
 					} else {
