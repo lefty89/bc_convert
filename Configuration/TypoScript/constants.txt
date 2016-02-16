@@ -12,4 +12,8 @@ plugin.tx_bcconvert {
 		# cat=plugin.tx_bcconvert//a; type=string; label=Default storage PID
 		storagePid =
 	}
+    settings {
+        # cat=plugin.tx_bcconvert//a; type=string; label=File storage path
+        fileStoragePath = fileadmin/bc_convert5/
+    }
 }
