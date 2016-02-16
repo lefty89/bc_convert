@@ -21,11 +21,21 @@ use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 class InfoController extends ActionController {
 
 	/**
+	 * fileRepository
+	 *
+	 * @var \BC\BcConvert\Domain\Repository\FileRepository
+	 * @inject
+	 */
+	protected $fileRepository;
+
+	/**
 	 * show action
 	 */
 	public function showAction() {
 
 		$this->addResources();
+
+		$this->view->assign('files', $this->fileRepository->findAll());
 	}
 
 	/**
@@ -41,5 +51,10 @@ class InfoController extends ActionController {
 
 		// required css files
 		$pr->addCssFile($extPath.'css/style.css');
+
+		// required javascript files
+		$pr->addJsFooterFile($extPath.'js/cryptojs/rollups/md5.js');
+		$pr->addJsFooterFile($extPath.'js/cryptojs/components/lib-typedarrays-min.js');
+		$pr->addJsFooterFile($extPath.'js/main.js');
 	}
 }
