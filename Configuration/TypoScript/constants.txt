@@ -14,6 +14,6 @@ plugin.tx_bcconvert {
 	}
     settings {
         # cat=plugin.tx_bcconvert//a; type=string; label=File storage path
-        fileStoragePath = fileadmin/bc_convert5/
+        fileStoragePath = typo3temp/bugcluster/convert/
     }
 }
