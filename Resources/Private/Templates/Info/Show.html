@@ -5,12 +5,15 @@
 
 <f:section name="Main">
 
-    <div class="file-drop" data-url="{f:uri.action(action:'handle', controller:'File', pluginName:'File', pageType:'165237')}">
-        <div class="text">Drop file here</div>
+    <div class="file-drop-wrapper">
+        <div class="file-drop" data-url="{f:uri.action(action:'handle', controller:'File', pluginName:'File', pageType:'165237')}" data-worker="{f:uri.resource(path:'js/blob_worker.js')}">
+            <div class="text">Drop file here</div>
+        </div>
     </div>
 
     <div class="progress-bar red shine">
-        <span style="width:0%"></span>
+        <span class="text"></span>
+        <span class="bar" style="width:0%"></span>
     </div>
 
     <ul>
