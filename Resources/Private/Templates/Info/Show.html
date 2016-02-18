@@ -22,7 +22,11 @@
                 <f:link.action target="_blank" action="download" controller="File" pluginName="File" pageType="165237" additionalParams="{v:'{file.hash}'}">
                     {file.name}
                 </f:link.action>
+                <f:link.action action="prepare" arguments="{file: file}">
+                    C
+                </f:link.action>
             </li>
         </f:for>
     </ul>
+
 </f:section>

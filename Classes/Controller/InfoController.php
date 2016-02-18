@@ -10,6 +10,8 @@ namespace BC\BcConvert\Controller;
  *
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
+use BC\BcConvert\Domain\Model\Queue;
+use BC\BcConvert\Utility\StandaloneUtility;
 use TYPO3\CMS\Core\Utility\ExtensionManagementUtility;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 
@@ -29,6 +31,14 @@ class InfoController extends ActionController {
 	protected $fileRepository;
 
 	/**
+	 * queueRepository
+	 *
+	 * @var \BC\BcConvert\Domain\Repository\QueueRepository
+	 * @inject
+	 */
+	protected $queueRepository;
+
+	/**
 	 * show action
 	 */
 	public function showAction() {
@@ -37,6 +47,36 @@ class InfoController extends ActionController {
 
 		$this->view->assign('files', $this->fileRepository->findByComplete(true));
 	}
+
+	/**
+	 * @param \BC\BcConvert\Domain\Model\File $file
+	 */
+	public function prepareAction($file) {
+		// renders the html for convert window
+		$html = StandaloneUtility::renderStandaloneView('EXT:bc_convert/Resources/Private/Standalone/Prepare.html', array(
+			'queue' => new Queue(),
+			'file' => $file,
+			'audioBitrates' => array(
+				100 => 'low',
+				200 => 'medium'
+			),
+			'videoBitrates' => array(
+				100 => 'low',
+				200 => 'medium'
+			),
+		));
+
+		$this->view->assign('html', $html);
+	}
+
+	/**
+	 * @param \BC\BcConvert\Domain\Model\Queue $queue
+	 */
+	public function convertAction($queue) {
+		$this->queueRepository->add($queue);
+	}
+
+
 
 	/**
 	 * adds required resources (js/css)

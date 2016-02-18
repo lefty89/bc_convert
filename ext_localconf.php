@@ -7,11 +7,11 @@ if (!defined('TYPO3_MODE')) {
 	'BC.' . $_EXTKEY,
 	'Info',
 	array(
-		'Info' => 'show',
+		'Info' => 'show, convert, prepare',
 	),
 	// non-cacheable actions
 	array(
-		'Info' => 'show',
+		'Info' => 'show, convert, prepare',
 	)
 );
 
