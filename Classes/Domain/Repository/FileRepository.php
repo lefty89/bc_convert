@@ -72,6 +72,7 @@ class FileRepository extends Repository {
 			}
 		}
 		catch (Exception $e) {
+			error_log(print_r($e->getMessage(), TRUE));
 			return null;
 		}
 	}
@@ -110,6 +111,7 @@ class FileRepository extends Repository {
 			return $chunks;
 		}
 		catch (Exception $e) {
+			error_log(print_r($e->getMessage(), TRUE));
 			return null;
 		}
 	}
