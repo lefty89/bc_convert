@@ -4,7 +4,7 @@
     const BYTES_PER_CHUNK = 1024 * 1024; // 1MB chunk sizes.
 
     self.importScripts(
-        "/typo3conf/ext/bc_convert/Resources/Public/js/cryptojs/rollups/md5.js",
+        "/typo3conf/ext/bc_convert/Resources/Public/js/cryptojs/rollups/sha1.js",
         "/typo3conf/ext/bc_convert/Resources/Public/js/cryptojs/components/lib-typedarrays-min.js");
 
     /**
@@ -16,7 +16,7 @@
     {
         ret.chunks = [];
         var start  = 0;
-        var md5    = CryptoJS.algo.MD5.create();
+        var sha1   = CryptoJS.algo.SHA1.create();
 
         while (start < blob.size) {
 
@@ -44,14 +44,14 @@
                 var wordArray   = CryptoJS.lib.WordArray.create(arrayBuffer);
 
                 // updates the incremental hashing
-                md5.update(wordArray);
+                sha1.update(wordArray);
 
                 // add chunk hash to list
-                ret.chunks.push({blob: chunk, hash: CryptoJS.MD5(wordArray).toString(CryptoJS.enc.Hex)});
+                ret.chunks.push({blob: chunk, hash: CryptoJS.SHA1(wordArray).toString(CryptoJS.enc.Hex)});
             }
         }
         // calculate the complete file hash
-        ret.hash = md5.finalize().toString(CryptoJS.enc.Hex);
+        ret.hash = sha1.finalize().toString(CryptoJS.enc.Hex);
     };
 
     /**

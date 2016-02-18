@@ -13,7 +13,7 @@ use TYPO3\CMS\Extbase\Service\TypoScriptService;
  */
 class FileUtility {
 
-	const COMPLETE_HASH = "00000000000000000000000000000000";
+	const COMPLETE_HASH = "0000000000000000000000000000000000000000";
 
 	/**
 	 * get full typoscript settings for this extension
@@ -72,7 +72,7 @@ class FileUtility {
 		if (!is_dir($dir)) mkdir($dir, 0777, true);
 
 		// clean file name
-		$cleanName = preg_replace('/[^a-zA-Z0-9-_\.]/','', $manifest->name);
+		$cleanName = preg_replace('/[^a-zA-Z0-9-_\.]/','_', $manifest->name);
 
 		// concat temp filename
 		$filename = $dir.$cleanName.".temp";
@@ -145,8 +145,8 @@ class FileUtility {
 		if (($blob = file_get_contents("php://input")) === FALSE)
 			throw new Exception('Input data not valid');
 
-		/** @var string $md5 */
-		$md5 = md5($blob);
+		/** @var string $sha1 */
+		$sha1 = sha1($blob);
 
 		if (file_exists($file->getPath())) {
 
@@ -154,7 +154,7 @@ class FileUtility {
 			$fileManifest = FileUtility::readFileManifest($file);
 
 			// gets the index of the uploaded chunk
-			$idx = array_search($md5, $fileManifest->chunks);
+			$idx = array_search($sha1, $fileManifest->chunks);
 
 			if ($idx !== FALSE) {
 				// clear the new part in the manifest file
@@ -221,7 +221,7 @@ class FileUtility {
 		else throw new Exception('File could not be opened');
 
 		// validate complete file
-		if ((!is_file($file->getPath())) || ($hash !== md5_file($file->getPath()))) {
+		if ((!is_file($file->getPath())) || ($hash !== sha1_file($file->getPath()))) {
 			throw new Exception('File is not valid');
 		}
 

@@ -53,8 +53,6 @@ class InfoController extends ActionController {
 		$pr->addCssFile($extPath.'css/style.css');
 
 		// required javascript files
-		$pr->addJsFooterFile($extPath.'js/cryptojs/rollups/md5.js');
-		$pr->addJsFooterFile($extPath.'js/cryptojs/components/lib-typedarrays-min.js');
 		$pr->addJsFooterFile($extPath.'js/main.js');
 	}
 }
