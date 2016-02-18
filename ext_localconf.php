@@ -26,3 +26,6 @@ if (!defined('TYPO3_MODE')) {
 		'File' => 'handle, download, upload'
 	)
 );
+
+// scheduler task
+$GLOBALS['TYPO3_CONF_VARS']['SC_OPTIONS']['extbase']['commandControllers'][] = 'BC\\BcConvert\\Command\\ConvertCommandController';
