@@ -83,18 +83,24 @@ class FileUtility {
 			// open in write mode.
 			$fp = fopen($filename, 'w');
 
-			// write manifest
-			$man = json_encode($manifest) . PHP_EOL;
-			fwrite($fp, $man, strlen($man));
-			fflush($fp);
+			// lock file
+			if (flock($fp, LOCK_EX)) {
 
-			// buffer file size
-			$size = intval($manifest->size) + strlen($man);
+				// write manifest
+				$man = json_encode($manifest) . PHP_EOL;
+				fwrite($fp, $man, strlen($man));
+				fflush($fp);
 
-			// write dummy content
-			fseek($fp, $size-1, SEEK_SET);
-			fwrite($fp, 'a');
-			fflush($fp);
+				// buffer file size
+				$size = intval($manifest->size) + strlen($man);
+
+				// write dummy content
+				fseek($fp, $size-1, SEEK_SET);
+				fwrite($fp, 'a');
+				fflush($fp);
+				// unlock file
+				flock($fp, LOCK_UN);
+			}
 
 			// close file
 			fclose($fp);
@@ -119,6 +125,7 @@ class FileUtility {
 			$manifestString = fgets($fp);
 
 			fflush($fp);
+
 			// close file
 			fclose($fp);
 
@@ -157,16 +164,21 @@ class FileUtility {
 
 				// open in wrtie mode.
 				$fp = fopen($file->getPath(), 'c+');
+				// lock file
+				if (flock($fp, LOCK_EX)) {
 
-				# write manifest
-				fseek($fp, 0, SEEK_SET);
-				fwrite($fp, $jsonManifest, strlen($jsonManifest));
-				fflush($fp);
+					# write manifest
+					fseek($fp, 0, SEEK_SET);
+					fwrite($fp, $jsonManifest, strlen($jsonManifest));
+					fflush($fp);
 
-				# write data
-				fseek($fp, strlen($jsonManifest) + (1024 * 1024 * $idx), SEEK_SET);    // 1MB CHUNK SIZE
-				fwrite($fp, $blob, strlen($blob));
-				fflush($fp);
+					# write data
+					fseek($fp, strlen($jsonManifest) + (1024 * 1024 * $idx), SEEK_SET);    // 1MB CHUNK SIZE
+					fwrite($fp, $blob, strlen($blob));
+					fflush($fp);
+					// unlock file
+					flock($fp, LOCK_UN);
+				}
 
 				// close file
 				fclose($fp);
