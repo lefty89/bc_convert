@@ -218,6 +218,7 @@ class FileUtility {
 
 		// rename file to its original name
 		if (rename($file->getPath(), $filename)) {
+			$file->setComplete(true);
 			$file->setPath($filename);
 
 			return true;

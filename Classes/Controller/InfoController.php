@@ -35,7 +35,7 @@ class InfoController extends ActionController {
 
 		$this->addResources();
 
-		$this->view->assign('files', $this->fileRepository->findAll());
+		$this->view->assign('files', $this->fileRepository->findByComplete(true));
 	}
 
 	/**
