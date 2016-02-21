@@ -39,7 +39,7 @@ jQuery(document).ready(function() {
             _MANIFEST.chunks[k] = _FILE.chunks[k].hash;
         }
 
-        jQuery('.progress-bar .text').text("Upload Manifest");
+        setLoadingBarText("Upload Manifest");
         sendManifest();
     }
 
@@ -76,7 +76,6 @@ jQuery(document).ready(function() {
                 // update manifest
                 _MANIFEST.chunks = JSON.parse(xhr.responseText);
 
-                prepareLoadingBar();
                 // upload chunks
                 uploadChunk();
             }
@@ -95,6 +94,7 @@ jQuery(document).ready(function() {
             hash   : ''
         };
 
+        prepareLoadingBar();
         // hashes the given blob and split it into pieces
         worker.postMessage({method: 'splitAndHashFile', returnMethod: 'createManifest', parameter: {blob: _FILE.blob}});
     }
@@ -103,7 +103,7 @@ jQuery(document).ready(function() {
     {
         var chunk = getRandomChunk();
         if (chunk === null) {
-            jQuery('.progress-bar .text').text("Upload completed");
+            setLoadingBarText("Upload completed");
             return;
         }
 
@@ -142,7 +142,7 @@ jQuery(document).ready(function() {
             }
         });
 
-        jQuery('.progress-bar .text').text("Upload chunk");
+        setLoadingBarText("Upload chunk");
         xhr.send(chunk.blob);
     }
 
@@ -162,17 +162,31 @@ jQuery(document).ready(function() {
         return chunk;
     }
 
-    function prepareLoadingBar()
-    {
-        jQuery('#bugcluster-video-converter .progress-bar span.bar').css({
-            width: 0
-        })
+    /**
+     * hides the upload box
+     */
+    function prepareLoadingBar() {
+        jQuery('#bugcluster-video-converter .bc-content .bc-upload .bc-file-drop').hide();
     }
 
-    function updateLoadingBar()
+    /**
+     * shows the loading circle
+     */
+    function updateLoadingBar(progress)
     {
-        jQuery('#bugcluster-video-converter .progress-bar span.bar').css('width', function(){
-            return (((_FILE.chunks.length-_MANIFEST.chunks.length)/_FILE.chunks.length)*100) + "%";
+        var pro = (progress) || (_FILE.chunks.length-_MANIFEST.chunks.length)/_FILE.chunks.length;
+
+        jQuery('#bugcluster-video-converter .bc-content .bc-upload .progress').show();
+        jQuery('#bugcluster-video-converter .bc-content .bc-upload .progress .circle-container').circleProgress('value', pro);
+    }
+
+    /**
+     * sets the loading circle text
+     */
+    function setLoadingBarText(text)
+    {
+        jQuery('#bugcluster-video-converter .bc-content .bc-upload .progress .circle-container strong').text(function(){
+            return text;
         });
     }
 
@@ -197,7 +211,8 @@ jQuery(document).ready(function() {
             }
             case 'updateInfoMessage': {
                 // update info text
-                jQuery('.progress-bar .text').text(e.data.text);
+                updateLoadingBar(e.data.progress);
+                setLoadingBarText(e.data.text);
                 break;
             }
         }

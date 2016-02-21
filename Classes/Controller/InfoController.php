@@ -94,6 +94,8 @@ class InfoController extends ActionController {
 		$pr->addCssFile($extPath.'css/style.css');
 
 		// required javascript files
+		$pr->addJsFooterFile($extPath.'js/ui.js');
 		$pr->addJsFooterFile($extPath.'js/main.js');
+		$pr->addJsFooterFile($extPath.'js/circle-progress.js');
 	}
 }

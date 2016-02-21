@@ -5,16 +5,57 @@
 
 <f:section name="Main">
 
-    <div class="file-drop-wrapper">
-        <div class="file-drop" data-url="{f:uri.action(action:'handle', controller:'File', pluginName:'File', pageType:'165237')}" data-worker="{f:uri.resource(path:'js/blob_worker.js')}">
-            <div class="text">Drop file here</div>
+    <div id="bc-uploader">
+        <div class="bc-banner">
+            <span class="filename">Video.mp4</span>
         </div>
+        <div class="bc-content">
+            <div class="bc-upload">
+                <div data-index="1" class="bc-file-drop">
+                    <div class="file-drop" data-url="{f:uri.action(action:'handle', controller:'File', pluginName:'File', pageType:'165237')}" data-worker="{f:uri.resource(path:'js/blob_worker.js')}">
+                        <div class="text">Drop file here</div>
+                    </div>
+                </div>
+                <div class="progress">
+                    <div class="circle-container">
+                        <strong>100<i>%</i></strong>
+                    </div>
+                </div>
+            </div>
+
+            <div data-index="2" class="bc-transcode">
+                <div class="form">
+
+                </div>
+                <div class="progress">
+                    <div class="circle-container">
+                        <strong>100<i>%</i></strong>
+                    </div>
+                </div>
+            </div>
+
+
+            <div data-index="3" class="bc-list">
+                <ul>
+                    <li><a href="www.google.de">Datei1.mp4</a></li>
+                    <li><a href="www.google.de">Datei2.mp4</a></li>
+                    <li><a href="www.google.de">Datei3.mp4</a></li>
+                </ul>
+            </div>
+
+
+        </div>
+        <ul class="bc-controls">
+            <li data-index="1" class="upload">Upload</li>
+            <li data-index="2" class="transcode disabled">Transcode</li>
+            <li data-index="3" class="list disabled">List</li>
+        </ul>
     </div>
 
-    <div class="progress-bar red shine">
-        <span class="text"></span>
-        <span class="bar" style="width:0%"></span>
-    </div>
+
+
+
+
 
     <ul>
         <f:for each="{files}" as="file">

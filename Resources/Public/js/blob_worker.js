@@ -36,7 +36,7 @@
             // hash chunk blob
             if (chunk !== null) {
                 // set info message
-                self.postMessage({returnMethod: "updateInfoMessage", text: "Hashing... (" + (start/BYTES_PER_CHUNK) + "/" + Math.ceil(blob.size/BYTES_PER_CHUNK) + ")"});
+                self.postMessage({returnMethod: "updateInfoMessage", text: "Hashing... (" + (start/BYTES_PER_CHUNK) + "/" + Math.ceil(blob.size/BYTES_PER_CHUNK) + ")", progress: start/blob.size});
 
                 var reader = new FileReaderSync();
                 // read file as array buffer

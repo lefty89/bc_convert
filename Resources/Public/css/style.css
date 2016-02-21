@@ -1,23 +1,61 @@
 /* line 10, ../../Private/Sass/style.scss */
-.file-drop-wrapper {
-  /* whatever width you want */
+#bc-uploader {
+  background-color: #323232;
+  border: 3px solid black;
+  width: 60%;
+}
+/* line 15, ../../Private/Sass/style.scss */
+#bc-uploader ul.bc-controls {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+/* line 21, ../../Private/Sass/style.scss */
+#bc-uploader ul.bc-controls li {
   display: inline-block;
+  padding: 5px;
+  font-size: 14px;
+  font-weight: bold;
+  color: #CCC;
+  cursor: pointer;
+}
+/* line 29, ../../Private/Sass/style.scss */
+#bc-uploader ul.bc-controls li.disabled {
+  font-weight: normal;
+  color: #848484;
+}
+/* line 36, ../../Private/Sass/style.scss */
+#bc-uploader div.bc-banner {
+  padding: 10px 5px;
+}
+/* line 39, ../../Private/Sass/style.scss */
+#bc-uploader div.bc-banner span {
+  font-size: 18px;
+  font-weight: bold;
+  color: grey;
+}
+/* line 47, ../../Private/Sass/style.scss */
+#bc-uploader div.bc-content {
+  padding: 5%;
+}
+/* line 52, ../../Private/Sass/style.scss */
+#bc-uploader div.bc-content div.bc-upload div.bc-file-drop {
   position: relative;
   padding-bottom: 10%;
-  width: 50%;
+  width: 100%;
 }
-/* line 17, ../../Private/Sass/style.scss */
-.file-drop-wrapper:after {
+/* line 57, ../../Private/Sass/style.scss */
+#bc-uploader div.bc-content div.bc-upload div.bc-file-drop:after {
   padding-top: 56.25%;
   /* 16:9 ratio */
   display: block;
   content: '';
 }
-/* line 24, ../../Private/Sass/style.scss */
-.file-drop-wrapper .file-drop {
+/* line 64, ../../Private/Sass/style.scss */
+#bc-uploader div.bc-content div.bc-upload div.bc-file-drop .file-drop {
   display: block;
   border: 5px dashed grey;
-  background-color: #EEE;
+  background-color: #242424;
   text-align: center;
   vertical-align: middle;
   position: absolute;
@@ -26,8 +64,8 @@
   right: 0;
   left: 0;
 }
-/* line 36, ../../Private/Sass/style.scss */
-.file-drop-wrapper .file-drop .text {
+/* line 76, ../../Private/Sass/style.scss */
+#bc-uploader div.bc-content div.bc-upload div.bc-file-drop .file-drop .text {
   cursor: default;
   font-size: 2em;
   font-weight: bold;
@@ -40,102 +78,29 @@
   -ms-transform: translateY(-50%);
   transform: translateY(-50%);
 }
-
-/* line 54, ../../Private/Sass/style.scss */
-.progress-bar {
-  position: relative;
-  background-color: #1a1a1a;
-  height: 25px;
-  width: 350px;
-  margin: 50px 0;
-  border-radius: 5px;
-  box-shadow: 0 1px 5px #000 inset, 0 1px 0 #444;
-  border: 5px solid #171717;
+/* line 92, ../../Private/Sass/style.scss */
+#bc-uploader div.bc-content div.bc-upload div.progress {
+  display: none;
 }
-/* line 64, ../../Private/Sass/style.scss */
-.progress-bar span.bar {
-  display: inline-block;
-  height: 100%;
-  border-radius: 3px;
-  box-shadow: 0 1px 0 rgba(255, 255, 255, 0.5) inset;
-  transition: width .4s ease-in-out;
-  position: absolute;
-  z-index: 3;
+/* line 97, ../../Private/Sass/style.scss */
+#bc-uploader div.bc-content div.bc-transcode {
+  display: none;
 }
-/* line 73, ../../Private/Sass/style.scss */
-.progress-bar span.bar::after {
-  content: '';
-  opacity: 0;
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  background: #fff;
-  border-radius: 3px;
-  animation: animate-shine 2s ease-out infinite;
-}
-/* line 87, ../../Private/Sass/style.scss */
-.progress-bar span.text {
-  position: absolute;
-  width: 100%;
-  box-sizing: border-box;
-  text-align: center;
-  color: white;
-  font-weight: bold;
-  z-index: 5;
-  font-size: 14px;
-  padding: 3px 0px 0px;
-}
-
-/* line 101, ../../Private/Sass/style.scss */
-.blue span.bar {
-  background-color: #34c2e3;
-}
-
 /* line 105, ../../Private/Sass/style.scss */
-.orange span.bar {
-  background-color: #fecf23;
-  background-image: linear-gradient(top, #fecf23, #fd9215);
+#bc-uploader div.bc-content div.bc-list {
+  display: none;
 }
-
-/* line 110, ../../Private/Sass/style.scss */
-.red span.bar {
-  background-color: #FF4D4D;
-  background-image: linear-gradient(top, #FF5C5C, #B24040);
+/* line 112, ../../Private/Sass/style.scss */
+#bc-uploader div.bc-content div.circle-container {
+  position: relative;
+  text-align: center;
 }
-
-/* line 115, ../../Private/Sass/style.scss */
-.green span.bar {
-  background-color: #a5df41;
-  background-image: linear-gradient(top, #a5df41, #4ca916);
-}
-
-/* line 120, ../../Private/Sass/style.scss */
-.stripes span.bar {
-  background-size: 30px 30px;
-  background-image: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.15) 50%, rgba(255, 255, 255, 0.15) 75%, transparent 75%, transparent);
-  animation: animate-stripes 3s linear infinite;
-}
-
-@keyframes animate-stripes {
-  0% {
-    background-position: 0 0;
-  }
-  100% {
-    background-position: 60px 0;
-  }
-}
-@keyframes animate-shine {
-  0% {
-    opacity: 0;
-    width: 0;
-  }
-  50% {
-    opacity: .5;
-  }
-  100% {
-    opacity: 0;
-    width: 95%;
-  }
+/* line 116, ../../Private/Sass/style.scss */
+#bc-uploader div.bc-content div.circle-container strong {
+  position: absolute;
+  font-size: 16px;
+  color: #a4a4a4;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
 }
