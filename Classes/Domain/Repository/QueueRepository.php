@@ -15,6 +15,7 @@ use TYPO3\CMS\Extbase\Persistence\Repository;
 class QueueRepository extends Repository {
 
 	/**
+	 * gets the next video added to queue
 	 * @return array|\TYPO3\CMS\Extbase\Persistence\QueryResultInterface
 	 */
 	public function getNextItem()
@@ -23,8 +24,13 @@ class QueueRepository extends Repository {
 		$query = $this->createQuery();
 
 		$query->setOrderings(array(
-			'uid' => QueryInterface::ORDER_ASCENDING)
+			'time' => QueryInterface::ORDER_DESCENDING)
 		);
+
+		// get only video files
+		$query->matching($query->like('file.mime', "video/%"));
+
+		// ignore pid
 		$query->getQuerySettings()->setRespectStoragePage(false);
 
 		return $query->execute();

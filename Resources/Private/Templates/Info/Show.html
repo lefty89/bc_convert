@@ -23,7 +23,10 @@
                     {file.name}
                 </f:link.action>
                 <f:link.action action="prepare" arguments="{file: file}">
-                    C
+                   CONVERT
+                </f:link.action>
+                <f:link.action target="_blank" action="state" controller="File" pluginName="File" pageType="165237" arguments="{hash: file.hash}">
+                    STATE
                 </f:link.action>
             </li>
         </f:for>

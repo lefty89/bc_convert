@@ -42,6 +42,7 @@ bcConvertUploadController {
                 1 = handle
                 2 = download
                 3 = upload
+                4 = state
             }
         }
     }

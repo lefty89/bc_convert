@@ -11,6 +11,7 @@ namespace BC\BcConvert\Controller;
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
 
+use BC\BcConvert\Utility\ConvertUtility;
 use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 
@@ -55,6 +56,24 @@ class FileController extends ActionController {
 		}
 	}
 
+
+	/**
+	 * @param string $hash
+	 */
+	public function stateAction($hash)
+	{
+		$data = array();
+
+		/** @var \BC\BcConvert\Domain\Model\File $file */
+		$file = $this->fileRepository->findOneByHash($hash);
+
+		if ($file !== NULL) {
+			ConvertUtility::parseCurrentProcess($file, $data);
+		}
+
+		echo json_encode($data); exit;
+	}
+
 	/**
 	 * creates the manifest and returns the chunk list
 	 */
@@ -78,4 +97,5 @@ class FileController extends ActionController {
 		}
 		echo json_encode($chunks ?: array());
 	}
+
 }

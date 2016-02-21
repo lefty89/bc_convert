@@ -2,6 +2,7 @@
 
 namespace BC\BcConvert\Command;
 
+use BC\BcConvert\Utility\ConvertUtility;
 use TYPO3\CMS\Extbase\Mvc\Controller\CommandController;
 
 class ConvertCommandController extends CommandController {
@@ -25,10 +26,15 @@ class ConvertCommandController extends CommandController {
 	 */
 	public function convertVideoCommand() {
 
-		$queue = $this->queueRepository->getNextItem();
+		if (ConvertUtility::isCurrentlyConverting() === NULL) {
 
+			/** @var \BC\BcConvert\Domain\Model\Queue $queue */
+			$queue = $this->queueRepository->getNextItem()->getFirst();
 
-		$this->output(' Objekte wurden als Buchungen hinzugefügt.' . "\n");
+			if ($queue !== NULL) {
+				ConvertUtility::startConvertingVideo($queue);
+			}
+		}
 	}
 
 } 

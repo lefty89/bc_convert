@@ -16,10 +16,10 @@ return array(
 		'iconfile' => \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extRelPath('bc_convert') . 'Resources/Public/Icons/entity.gif'
 	),
 	'interface' => array(
-		'showRecordFieldList' => 'file, video_bitrate, audio_bitrate, mp4, ogg, webm',
+		'showRecordFieldList' => 'file, video_bitrate, audio_bitrate, mp4, ogg, webm, time',
 	),
 	'types' => array(
-		'1' => array('showitem' => 'file, video_bitrate, audio_bitrate, mp4, ogg, webm'),
+		'1' => array('showitem' => 'file, video_bitrate, audio_bitrate, mp4, ogg, webm, time'),
 	),
 	'palettes' => array(
 		'1' => array('showitem' => ''),
@@ -33,7 +33,7 @@ return array(
 				'minitems' => 1,
 				'maxitems' => 1,
 				'size' => 1,
-				'foreign_table' => 'tx_bc_convert_domain_model_file',
+				'foreign_table' => 'tx_bcconvert_domain_model_file',
 			)
 		),
 		'video_bitrate' => Array (
@@ -72,6 +72,18 @@ return array(
 			'config' => array(
 				'type' => 'check',
 			),
+		),
+		'time' => Array (
+			'exclude' => 1,
+			'label' => 'Queue time',
+			'config' => Array (
+				'type' => 'input',
+				'size' => 13,
+				'max' => 20,
+				'eval' => 'datetime',
+				'checkbox' => 0,
+				'default' => 0,
+			)
 		),
 	),
 );

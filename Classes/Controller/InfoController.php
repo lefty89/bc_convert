@@ -52,6 +52,7 @@ class InfoController extends ActionController {
 	 * @param \BC\BcConvert\Domain\Model\File $file
 	 */
 	public function prepareAction($file) {
+
 		// renders the html for convert window
 		$html = StandaloneUtility::renderStandaloneView('EXT:bc_convert/Resources/Private/Standalone/Prepare.html', array(
 			'queue' => new Queue(),
@@ -73,10 +74,10 @@ class InfoController extends ActionController {
 	 * @param \BC\BcConvert\Domain\Model\Queue $queue
 	 */
 	public function convertAction($queue) {
+		// set convert time to now
+		$queue->setTime(date_create());
 		$this->queueRepository->add($queue);
 	}
-
-
 
 	/**
 	 * adds required resources (js/css)

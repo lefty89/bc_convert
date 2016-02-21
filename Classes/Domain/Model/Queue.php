@@ -24,6 +24,11 @@ class Queue extends AbstractEntity {
 	protected $file;
 
 	/**
+	 * @var \DateTime
+	 */
+	protected $time;
+
+	/**
 	 * videoBitrate
 	 *
 	 * @var int
@@ -152,5 +157,21 @@ class Queue extends AbstractEntity {
 	public function setOgg($Ogg)
 	{
 		$this->ogg = $Ogg;
+	}
+
+	/**
+	 * @return \DateTime
+	 */
+	public function getTime()
+	{
+		return $this->time;
+	}
+
+	/**
+	 * @param \DateTime $time
+	 */
+	public function setTime($time)
+	{
+		$this->time = $time;
 	}
 }
