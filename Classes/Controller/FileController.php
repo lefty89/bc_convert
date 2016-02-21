@@ -22,6 +22,11 @@ use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 class FileController extends ActionController {
 
 	/**
+	 * @var string
+	 */
+	protected $defaultViewObjectName = 'TYPO3\\CMS\\Extbase\\Mvc\\View\\JsonView';
+
+	/**
 	 * fileRepository
 	 *
 	 * @var \BC\BcConvert\Domain\Repository\FileRepository
@@ -38,7 +43,6 @@ class FileController extends ActionController {
 			case '1': {$this->getManifest();  break;}
 			case '2': {$this->putFileChunk(); break;}
 		}
-		exit;
 	}
 
 	/**
@@ -56,7 +60,6 @@ class FileController extends ActionController {
 		}
 	}
 
-
 	/**
 	 * @param string $hash
 	 */
@@ -71,7 +74,7 @@ class FileController extends ActionController {
 			ConvertUtility::parseCurrentProcess($file, $data);
 		}
 
-		echo json_encode($data); exit;
+		$this->view->assign('value', $data);
 	}
 
 	/**
@@ -83,7 +86,7 @@ class FileController extends ActionController {
 		if (($chunks = $this->fileRepository->createManifest()) === null) {
 			$this->response->setStatus(400);
 		}
-		echo json_encode($chunks ?: array());
+		$this->view->assign('value', $chunks ?: array());
 	}
 
 	/**
@@ -95,7 +98,7 @@ class FileController extends ActionController {
 		if (($chunks = $this->fileRepository->addChunkToFile()) === null) {
 			$this->response->setStatus(400);
 		}
-		echo json_encode($chunks ?: array());
+		$this->view->assign('value', $chunks ?: array());
 	}
 
 }
