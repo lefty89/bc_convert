@@ -7,11 +7,11 @@ if (!defined('TYPO3_MODE')) {
 	'BC.' . $_EXTKEY,
 	'Info',
 	array(
-		'Info' => 'show, convert, prepare',
+		'Info' => 'show',
 	),
 	// non-cacheable actions
 	array(
-		'Info' => 'show, convert, prepare',
+		'Info' => 'show',
 	)
 );
 
@@ -19,11 +19,11 @@ if (!defined('TYPO3_MODE')) {
 	'BC.'.$_EXTKEY,
 	'File',
 	array(
-		'File' => 'handle, download, upload',
+		'File' => 'handle, download, upload, queueState, state, convert, transcodeList',
 	),
 	// non-cacheable actions
 	array(
-		'File' => 'handle, download, upload'
+		'File' => 'handle, download, upload, queueState, state, convert, transcodeList'
 	)
 );
 

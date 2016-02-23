@@ -9,6 +9,15 @@ use TYPO3\CMS\Core\Utility\GeneralUtility;
  */
 class ConvertUtility {
 
+	/**
+	 * checks whether the converting script is currently running and returns its given hash
+	 * @param \BC\BcConvert\Domain\Model\File $file
+	 * @return boolean
+	 */
+	public static function isConvertable($file)
+	{
+		return (strpos($file->getMime(), "video/") !==  FALSE);
+	}
 
 	/**
 	 * checks whether the converting script is currently running and returns its given hash
@@ -33,12 +42,12 @@ class ConvertUtility {
 	/**
 	 * FROM: http://stackoverflow.com/questions/11441517/ffmpeg-progress-bar-encoding-percentage-in-php
 	 * @param \BC\BcConvert\Domain\Model\File $file
-	 * @param $data
+	 * @param array $data
 	 */
 	public static function parseCurrentProcess($file, &$data)
 	{
 		/** @var string $log */
-		$log = dirname($file->getPath())."/log.txt";
+		$log = PATH_site.dirname($file->getPath())."/log.txt";
 
 		if ($content = @file_get_contents($log)){
 

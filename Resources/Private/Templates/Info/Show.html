@@ -7,11 +7,14 @@
 
     <div id="bc-uploader">
         <div class="bc-banner">
-            <span class="filename">Video.mp4</span>
+            <a class="filelink" target="_blank">
+                <h3 class="filename"></h3>
+                <span class="filesize"></span>
+            </a>
         </div>
         <div class="bc-content">
-            <div class="bc-upload">
-                <div data-index="1" class="bc-file-drop">
+            <div data-index="1" class="bc-upload">
+                <div class="bc-file-drop">
                     <div class="file-drop" data-url="{f:uri.action(action:'handle', controller:'File', pluginName:'File', pageType:'165237')}" data-worker="{f:uri.resource(path:'js/blob_worker.js')}">
                         <div class="text">Drop file here</div>
                     </div>
@@ -24,8 +27,11 @@
             </div>
 
             <div data-index="2" class="bc-transcode">
+                <div class="spinner">
+                    <div class="loader"></div>
+                </div>
                 <div class="form">
-
+                    <f:render partial="TranscodeForm" />
                 </div>
                 <div class="progress">
                     <div class="circle-container">
@@ -34,15 +40,9 @@
                 </div>
             </div>
 
-
             <div data-index="3" class="bc-list">
-                <ul>
-                    <li><a href="www.google.de">Datei1.mp4</a></li>
-                    <li><a href="www.google.de">Datei2.mp4</a></li>
-                    <li><a href="www.google.de">Datei3.mp4</a></li>
-                </ul>
+                <p>Liste</p>
             </div>
-
 
         </div>
         <ul class="bc-controls">

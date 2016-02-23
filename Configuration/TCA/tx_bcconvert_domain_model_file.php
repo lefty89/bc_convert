@@ -16,10 +16,10 @@ return array(
 		'iconfile' => \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extRelPath('bc_convert') . 'Resources/Public/Icons/entity.gif'
 	),
 	'interface' => array(
-		'showRecordFieldList' => 'name, hash, mime, size, complete, path',
+		'showRecordFieldList' => 'name, hash, mime, size, complete, path, mirror',
 	),
 	'types' => array(
-		'1' => array('showitem' => 'name, hash, mime, size, complete, path'),
+		'1' => array('showitem' => 'name, hash, mime, size, complete, path, mirror'),
 	),
 	'palettes' => array(
 		'1' => array('showitem' => ''),
@@ -70,6 +70,14 @@ return array(
 			'label' => 'path',
 			'config' => array(
 				'type' => 'input',
+			),
+		),
+		'mirror' => Array (
+			'exclude' => 0,
+			'label' => 'size',
+			'config' => array(
+				'type' => 'input',
+				'eval' => 'int'
 			),
 		),
 	),

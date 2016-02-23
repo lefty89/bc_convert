@@ -43,6 +43,9 @@ bcConvertUploadController {
                 2 = download
                 3 = upload
                 4 = state
+                5 = queueState
+                6 = convert
+                7 = transcodeList
             }
         }
     }

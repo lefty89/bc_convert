@@ -43,25 +43,18 @@ class Queue extends AbstractEntity {
 	protected $audioBitrate;
 
 	/**
-	 * Webm
+	 * format
 	 *
-	 * @var boolean
+	 * @var int
 	 */
-	protected $webm;
+	protected $format;
 
 	/**
-	 * Mp4
+	 * complete
 	 *
 	 * @var boolean
 	 */
-	protected $mp4;
-
-	/**
-	 * Ogg
-	 *
-	 * @var boolean
-	 */
-	protected $ogg;
+	protected $complete;
 
 	/**
 	 * @return \BC\BcConvert\Domain\Model\File
@@ -112,54 +105,6 @@ class Queue extends AbstractEntity {
 	}
 
 	/**
-	 * @return boolean
-	 */
-	public function isWebm()
-	{
-		return $this->webm;
-	}
-
-	/**
-	 * @param boolean $Webm
-	 */
-	public function setWebm($Webm)
-	{
-		$this->webm = $Webm;
-	}
-
-	/**
-	 * @return boolean
-	 */
-	public function isMp4()
-	{
-		return $this->mp4;
-	}
-
-	/**
-	 * @param boolean $Mp4
-	 */
-	public function setMp4($Mp4)
-	{
-		$this->mp4 = $Mp4;
-	}
-
-	/**
-	 * @return boolean
-	 */
-	public function isOgg()
-	{
-		return $this->ogg;
-	}
-
-	/**
-	 * @param boolean $Ogg
-	 */
-	public function setOgg($Ogg)
-	{
-		$this->ogg = $Ogg;
-	}
-
-	/**
 	 * @return \DateTime
 	 */
 	public function getTime()
@@ -173,5 +118,37 @@ class Queue extends AbstractEntity {
 	public function setTime($time)
 	{
 		$this->time = $time;
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getFormat()
+	{
+		return $this->format;
+	}
+
+	/**
+	 * @param int $format
+	 */
+	public function setFormat($format)
+	{
+		$this->format = $format;
+	}
+
+	/**
+	 * @return boolean
+	 */
+	public function isComplete()
+	{
+		return $this->complete;
+	}
+
+	/**
+	 * @param boolean $complete
+	 */
+	public function setComplete($complete)
+	{
+		$this->complete = $complete;
 	}
 }

@@ -45,6 +45,13 @@ class File extends AbstractEntity {
 	protected $size;
 
 	/**
+	 * mirror
+	 *
+	 * @var int
+	 */
+	protected $mirror;
+
+	/**
 	 * complete
 	 *
 	 * @var boolean
@@ -152,6 +159,22 @@ class File extends AbstractEntity {
 	public function setPath($path)
 	{
 		$this->path = $path;
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getMirror()
+	{
+		return $this->mirror;
+	}
+
+	/**
+	 * @param int $mirror
+	 */
+	public function setMirror($mirror)
+	{
+		$this->mirror = $mirror;
 	}
 
 }

@@ -1,0 +1,18 @@
+<html xmlns:f="http://typo3.org/ns/fluid/ViewHelpers"
+      data-namespace-typo3-fluid="true">
+
+<div class="transcode-template">
+    <p>
+        <strong>Video quality:</strong>
+        <f:form.select class="videoBitrate" options="{1:'low', 2:'medium', 3:'hight'}" />
+    <p>
+        <strong>Audio quality:</strong>
+        <f:form.select class="audioBitrate" options="{1:'low', 2:'medium', 3:'hight'}" />
+    </p>
+    <p>
+        <strong>Formats:</strong>
+        <f:form.select class="format" options="{1:'mp4', 2:'webm', 3:'ogg'}" />
+    </p>
+    <button class="send">Absenden</button>
+
+</div>

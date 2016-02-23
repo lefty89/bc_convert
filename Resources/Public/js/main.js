@@ -53,7 +53,6 @@ jQuery(document).ready(function() {
         xhr.responseType = 'text';
 
         // custom header
-        //xhr.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
         xhr.setRequestHeader("X-Message-Size", msg.length);
         xhr.setRequestHeader("X-File-Hash", _FILE.hash);
         xhr.setRequestHeader("X-Method", "1");
@@ -62,22 +61,16 @@ jQuery(document).ready(function() {
         xhr.upload.addEventListener('error', function(e) {
             alert(e.target.responseText);
         });
-
         // upload progress
         xhr.upload.addEventListener('progress', function(e) {
             console.log("upload manifest");
         });
-
         // notice that the event handler is on xhr and not xhr.upload
         xhr.addEventListener('readystatechange', function(e) {
             if ((xhr.readyState == 4) && (xhr.status == 200)) {
                 console.log("manifest upload completed");
-
-                // update manifest
-                _MANIFEST.chunks = JSON.parse(xhr.responseText);
-
-                // upload chunks
-                uploadChunk();
+                // process result
+                onUploadFinished(xhr.responseText);
             }
         });
 
@@ -94,7 +87,10 @@ jQuery(document).ready(function() {
             hash   : ''
         };
 
+        // ui stuff
         prepareLoadingBar();
+        fillBannerData(blob.name, blob.size);
+
         // hashes the given blob and split it into pieces
         worker.postMessage({method: 'splitAndHashFile', returnMethod: 'createManifest', parameter: {blob: _FILE.blob}});
     }
@@ -102,10 +98,7 @@ jQuery(document).ready(function() {
     function uploadChunk()
     {
         var chunk = getRandomChunk();
-        if (chunk === null) {
-            setLoadingBarText("Upload completed");
-            return;
-        }
+        if (chunk === null) return;
 
         var url = jQuery('.file-drop').attr('data-url');
         var xhr = new XMLHttpRequest();
@@ -113,6 +106,7 @@ jQuery(document).ready(function() {
         xhr.open('POST', url, true);
         xhr.responseType = 'text';
 
+        // custom header
         xhr.setRequestHeader("X-Message-Size", chunk.blob.size);
         xhr.setRequestHeader("X-File-Hash",  _FILE.hash);
         xhr.setRequestHeader("X-Method",  "2");
@@ -120,10 +114,9 @@ jQuery(document).ready(function() {
         // return value
         xhr.upload.addEventListener('load', function(e) {
         });
-
+        // error handler
         xhr.upload.addEventListener('error', function(e) {
         });
-
         // upload progress
         xhr.upload.addEventListener('progress', function(e) {
         });
@@ -132,13 +125,8 @@ jQuery(document).ready(function() {
         xhr.addEventListener('readystatechange', function(e) {
             if ((xhr.readyState == 4) && (xhr.status == 200)) {
                 console.log("chunk upload completed");
-
-                // update manifest
-                _MANIFEST.chunks = JSON.parse(xhr.responseText);
-
-                updateLoadingBar();
-                // upload chunks
-                uploadChunk();
+                // process result
+                onUploadFinished(xhr.responseText);
             }
         });
 
@@ -163,32 +151,32 @@ jQuery(document).ready(function() {
     }
 
     /**
-     * hides the upload box
+     * handle positive response from xhr upload
+     * @param responseText
      */
-    function prepareLoadingBar() {
-        jQuery('#bugcluster-video-converter .bc-content .bc-upload .bc-file-drop').hide();
-    }
-
-    /**
-     * shows the loading circle
-     */
-    function updateLoadingBar(progress)
+    function onUploadFinished(responseText)
     {
-        var pro = (progress) || (_FILE.chunks.length-_MANIFEST.chunks.length)/_FILE.chunks.length;
+        // get data
+        var data = JSON.parse(responseText);
+        _MANIFEST.chunks = data.chunks;
 
-        jQuery('#bugcluster-video-converter .bc-content .bc-upload .progress').show();
-        jQuery('#bugcluster-video-converter .bc-content .bc-upload .progress .circle-container').circleProgress('value', pro);
+        // ui update
+        updateLoadingBar((_FILE.chunks.length-_MANIFEST.chunks.length)/_FILE.chunks.length);
+
+        if (_MANIFEST.chunks.length > 0) {
+            // go with upload
+            uploadChunk();
+        }
+        else {
+            // upload finished
+            setLoadingBarText("Upload finished");
+
+            // sets the banner link
+            setBannerLink(data.link, _FILE.hash);
+            enableTabs(true, Boolean(data.cable), true);
+        }
     }
 
-    /**
-     * sets the loading circle text
-     */
-    function setLoadingBarText(text)
-    {
-        jQuery('#bugcluster-video-converter .bc-content .bc-upload .progress .circle-container strong').text(function(){
-            return text;
-        });
-    }
 
     /**
      * WEBWORKER PART
@@ -210,7 +198,7 @@ jQuery(document).ready(function() {
                 break;
             }
             case 'updateInfoMessage': {
-                // update info text
+                // ui stuff
                 updateLoadingBar(e.data.progress);
                 setLoadingBarText(e.data.text);
                 break;

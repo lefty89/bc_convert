@@ -13,6 +13,7 @@ CREATE TABLE tx_bcconvert_domain_model_file (
     size int(11) NOT NULL,
     complete tinyint(1) DEFAULT '0' NOT NULL,
     path varchar(255) NOT NULL,
+    mirror int(11) DEFAULT '0' NOT NULL,
 
     tstamp int(11) unsigned DEFAULT '0' NOT NULL,
     crdate int(11) unsigned DEFAULT '0' NOT NULL,
@@ -33,10 +34,8 @@ CREATE TABLE tx_bcconvert_domain_model_queue (
     file int(11) DEFAULT '0' NOT NULL,
     video_bitrate int(11) DEFAULT '0' NOT NULL
     audio_bitrate int(11) DEFAULT '0' NOT NULL,
-
-    mp4 tinyint(1) DEFAULT '0' NOT NULL
-    webm tinyint(1) DEFAULT '0' NOT NULL,
-    ogg tinyint(1) DEFAULT '0' NOT NULL,
+    format int(11) DEFAULT '0' NOT NULL,
+    complete tinyint(1) DEFAULT '0' NOT NULL,
 
     time datetime DEFAULT '0000-00-00 00:00:00',
 

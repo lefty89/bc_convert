@@ -9,6 +9,7 @@ namespace BC\BcConvert\Domain\Repository;
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
 use BC\BcConvert\Domain\Model\File;
+use BC\BcConvert\Utility\ConvertUtility;
 use BC\BcConvert\Utility\FileUtility;
 use BC\BcConvert\Utility\ValidationUtility;
 use Exception;
@@ -17,6 +18,20 @@ use TYPO3\CMS\Extbase\Persistence\Generic\PersistenceManager;
 use TYPO3\CMS\Extbase\Persistence\Repository;
 
 class FileRepository extends Repository {
+
+	/**
+	 * @param array $data
+	 * @param \BC\BcConvert\Domain\Model\File $file
+	 */
+	private function fillMessage(&$data, $file) {
+
+		$data = array_merge($data, array(
+			'link'  => $file->getPath(),
+			'cable' => ConvertUtility::isConvertable($file),
+			'list'  => array()
+		));
+
+	}
 
 	/**
 	 * @param string $path
@@ -41,10 +56,11 @@ class FileRepository extends Repository {
 	}
 
 	/**
-	 * @return array|null
+	 * @param array $data
+	 * @return boolean
 	 * @throws \Exception
 	 */
-	public function createManifest() {
+	public function createManifest(&$data) {
 
 		try
 		{
@@ -62,30 +78,31 @@ class FileRepository extends Repository {
 				$path = FileUtility::createPersistentFile($hash, $manifest);
 				// create a new file in the typo3 db
 				$this->createFileDbEntry($path, $hash, $manifest);
-				return $manifest->chunks;
+				$data['chunks'] = $manifest->chunks;
 			}
-			else
-			{
+			else if (!$file->isComplete()) {
 				/** @var Object $fileManifest */
 				$fileManifest = FileUtility::readFileManifest($file);
-				return array_merge(array_diff($fileManifest->chunks, array(FileUtility::COMPLETE_HASH)));
+				$data['chunks'] = array_merge(array_diff($fileManifest->chunks, array(FileUtility::COMPLETE_HASH)));
 			}
+			else $this->fillMessage($data, $file);
 		}
 		catch (Exception $e) {
 			error_log(print_r($e->getMessage(), TRUE));
-			return null;
+			return false;
 		}
+
+		return true;
 	}
 
 	/**
-	 * @return array|null
+	 * @param array $data
+	 * @return boolean
 	 */
-	public function addChunkToFile()
+	public function addChunkToFile(&$data)
 	{
 		try
 		{
-			$chunks = array();
-
 			/** @var string $hash */
 			$hash = ValidationUtility::getFileHash();
 
@@ -96,23 +113,44 @@ class FileRepository extends Repository {
 				/** @var Object $fileManifest */
 				$fileManifest = FileUtility::addChunkToExistingFile($file);
 				/** @var array $chunks */
-				$chunks = array_merge(array_diff($fileManifest->chunks, array(FileUtility::COMPLETE_HASH)));
-			}
+				$chunks = $data['chunks'] = array_merge(array_diff($fileManifest->chunks, array(FileUtility::COMPLETE_HASH)));
 
-			if (!count($chunks)) {
-				// complete file upload and update path
-				if (FileUtility::completeFile($hash, $file)) {
-					$this->update($file);
-					$persistenceManager = GeneralUtility::makeInstance(PersistenceManager::class);
-					$persistenceManager->persistAll();
+				if (!count($chunks)) {
+					// complete file upload and update path
+					if (FileUtility::completeFile($hash, $file)) {
+						$this->fillMessage($data, $file);
+						$file->setMirror($file->getUid());
+						$this->update($file);
+					}
 				}
 			}
-
-			return $chunks;
+			else throw new Exception('File was not found');
 		}
 		catch (Exception $e) {
 			error_log(print_r($e->getMessage(), TRUE));
-			return null;
+			return false;
 		}
+
+		return true;
+	}
+
+	/**
+	 * @param \BC\BcConvert\Domain\Model\File $file
+	 * @return array
+	 */
+	public function getMirrorList($file)
+	{
+		$result = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows(
+			"name, path",
+			"tx_bcconvert_domain_model_file",
+			sprintf("mirror = %d AND uid != %d",
+				$file->getMirror(),
+				$file->getUid()),
+			"",
+			"",
+			""
+		);
+
+		return $result;
 	}
 }

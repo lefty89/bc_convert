@@ -16,17 +16,17 @@ return array(
 		'iconfile' => \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extRelPath('bc_convert') . 'Resources/Public/Icons/entity.gif'
 	),
 	'interface' => array(
-		'showRecordFieldList' => 'file, video_bitrate, audio_bitrate, mp4, ogg, webm, time',
+		'showRecordFieldList' => 'file, video_bitrate, audio_bitrate, format, time, complete',
 	),
 	'types' => array(
-		'1' => array('showitem' => 'file, video_bitrate, audio_bitrate, mp4, ogg, webm, time'),
+		'1' => array('showitem' => 'file, video_bitrate, audio_bitrate, format, time, complete'),
 	),
 	'palettes' => array(
 		'1' => array('showitem' => ''),
 	),
 	'columns' => array(
 		'file' => Array (
-			'exclude' => 1,
+			'exclude' => 0,
 			'label' => 'file',
 			'config' => array(
 				'type' => 'select',
@@ -52,29 +52,16 @@ return array(
 				'eval' => 'int'
 			),
 		),
-		'mp4' => Array (
+		'format' => Array (
 			'exclude' => 0,
-			'label' => 'mp4',
+			'label' => 'format',
 			'config' => array(
-				'type' => 'check',
-			),
-		),
-		'ogg' => Array (
-			'exclude' => 0,
-			'label' => 'ogg',
-			'config' => array(
-				'type' => 'check',
-			),
-		),
-		'webm' => Array (
-			'exclude' => 0,
-			'label' => 'webm',
-			'config' => array(
-				'type' => 'check',
+				'type' => 'input',
+				'eval' => 'int'
 			),
 		),
 		'time' => Array (
-			'exclude' => 1,
+			'exclude' => 0,
 			'label' => 'Queue time',
 			'config' => Array (
 				'type' => 'input',
@@ -83,6 +70,14 @@ return array(
 				'eval' => 'datetime',
 				'checkbox' => 0,
 				'default' => 0,
+			)
+		),
+		'complete' => array(
+			'exclude' => 0,
+			'label' => 'complete',
+			'config' => array(
+				'type' => 'check',
+				'default' => 0
 			)
 		),
 	),

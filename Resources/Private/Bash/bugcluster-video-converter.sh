@@ -12,10 +12,10 @@ AUDIOQUALY="-acodec libvorbis -ac 2 -ab 96k -ar 44100"
 VIDEOQUALY="-b 345k -s 640x360"
 
 # split name and path
-FILENAME="${FULLPATH##*/}"                      # Strip longest match of */ from start
+FILENAME="${FULLPATH##*/}"                      	# Strip longest match of */ from start
 DIR="${FULLPATH:0:${#FULLPATH} - ${#FILENAME}}" 	# Substring from 0 thru pos of filename
-BASE="${FILENAME%.[^.]*}"                	# Strip shortest match of . plus at least one non-dot char from end
-EXT="${FILENAME:${#BASE} + 1}"            	# Substring from len of base thru end
+BASE="${FILENAME%.[^.]*}"                			# Strip shortest match of . plus at least one non-dot char from end
+EXT="${FILENAME:${#BASE} + 1}"            			# Substring from len of base thru end
 
 
 # check whether format is valid
@@ -41,5 +41,3 @@ esac
 
 
 bash -c "avconv -i ${FULLPATH} ${AUDIOQUALY} ${VIDEOQUALY} ${DIR}${BASE}.${NEW_EXT} 2>${DIR}log.txt"
-
-#echo "avconv -i ${FULLPATH} ${AUDIOQUALY} ${VIDEOQUALY} ${DIR}${BASE}.${NEW_EXT} 2>${DIR}log.txt"

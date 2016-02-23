@@ -31,7 +31,7 @@ class ConvertCommandController extends CommandController {
 			/** @var \BC\BcConvert\Domain\Model\Queue $queue */
 			$queue = $this->queueRepository->getNextItem()->getFirst();
 
-			if ($queue !== NULL) {
+			if (($queue !== NULL) && (!$this->queueRepository->convertingIsFinished($queue))) {
 				ConvertUtility::startConvertingVideo($queue);
 			}
 		}
