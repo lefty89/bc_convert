@@ -8,10 +8,11 @@ jQuery(document).ready(function() {
 
     jQuery('.circle-container').circleProgress({
         animation: false,
+        startAngle: -Math.PI/2,
         value: 0,
         size: 200,
         fill: {
-            gradient: ["red"]
+            gradient: ['#ff1e41', '#ff5f43']
         }
     });
 
