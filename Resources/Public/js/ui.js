@@ -107,17 +107,16 @@ function showConvertingState(json)
 
     if (json.progress !== undefined) {
         // currently converting my file
-        jQuery('#bugcluster-video-converter .bc-content .bc-transcode .progress .circle-container strong').text(function(){
-            return  json.progress + "% "    +
-                    json.duration + "sec "  +
-                    json.ctime + "sec";
+        jQuery('#bugcluster-video-converter .bc-content .bc-transcode .progress .circle-container strong').html(function(){
+            return  "Progress: " + json.progress + " % <br> Duration: " + secondsToHms(parseFloat(json.duration)) + " <br> Time: "  + secondsToHms(parseFloat(json.ctime));
         });
         jQuery('#bugcluster-video-converter .bc-content .bc-transcode .progress .circle-container').circleProgress('value', (parseInt(json.progress)/100));
     }
     else {
         // currently waiting in queue
         jQuery('#bugcluster-video-converter .bc-content .bc-transcode .progress .circle-container strong').text(function(){
-            return  "Position: " + parseInt(json.position);
+            return  (parseInt(json.position) == -1) ? "Get queue position" : ("Position: " + json.position);
+
         });
         jQuery('#bugcluster-video-converter .bc-content .bc-transcode .progress .circle-container').circleProgress('value', 0);
     }
@@ -225,13 +224,11 @@ function updateLoadingBar(progress)
 
 /**
  * sets the loading circle text
- * @param {string} progress
+ * @param {string} text
  */
 function setLoadingBarText(text)
 {
-    jQuery('#bugcluster-video-converter .bc-content .bc-upload .progress .circle-container strong').text(function(){
-        return text;
-    });
+    jQuery('#bugcluster-video-converter .bc-content .bc-upload .progress .circle-container strong').text(text);
 }
 
 /**
@@ -268,3 +265,18 @@ function bytesToSize(bytes, precision)
         return bytes + ' B';
     }
 }
+
+/**
+ * Formats the given seconds in the hms format
+ * FROM: http://stackoverflow.com/a/5539081
+ * @param {int} d
+ * @returns {string}
+ */
+function secondsToHms(d) {
+    d = Number(d);
+    var h = Math.floor(d / 3600);
+    var m = Math.floor(d % 3600 / 60);
+    var s = Math.floor(d % 3600 % 60);
+    return ((h > 0 ? h + ":" + (m < 10 ? "0" : "") : "") + m + ":" + (s < 10 ? "0" : "") + s); }
+
+

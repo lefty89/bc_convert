@@ -63,12 +63,10 @@ jQuery(document).ready(function() {
         });
         // upload progress
         xhr.upload.addEventListener('progress', function(e) {
-            console.log("upload manifest");
         });
         // notice that the event handler is on xhr and not xhr.upload
         xhr.addEventListener('readystatechange', function(e) {
             if ((xhr.readyState == 4) && (xhr.status == 200)) {
-                console.log("manifest upload completed");
                 // process result
                 onUploadFinished(xhr.responseText);
             }
@@ -124,13 +122,11 @@ jQuery(document).ready(function() {
         // notice that the event handler is on xhr and not xhr.upload
         xhr.addEventListener('readystatechange', function(e) {
             if ((xhr.readyState == 4) && (xhr.status == 200)) {
-                console.log("chunk upload completed");
                 // process result
                 onUploadFinished(xhr.responseText);
             }
         });
 
-        setLoadingBarText("Upload chunk");
         xhr.send(chunk.blob);
     }
 
@@ -156,22 +152,19 @@ jQuery(document).ready(function() {
      */
     function onUploadFinished(responseText)
     {
-        // get data
         var data = JSON.parse(responseText);
         _MANIFEST.chunks = data.chunks;
 
         // ui update
-        updateLoadingBar((_FILE.chunks.length-_MANIFEST.chunks.length)/_FILE.chunks.length);
+        var progress = (_FILE.chunks.length-_MANIFEST.chunks.length)/_FILE.chunks.length;
+        updateLoadingBar(progress);
 
         if (_MANIFEST.chunks.length > 0) {
-            // go with upload
+            setLoadingBarText("Progress: "+Math.round(progress*100)+" %");
             uploadChunk();
         }
         else {
-            // upload finished
             setLoadingBarText("Upload finished");
-
-            // sets the banner link
             setBannerLink(data.link, _FILE.hash);
             enableTabs(true, Boolean(data.cable), true);
         }
