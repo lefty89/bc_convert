@@ -160,7 +160,7 @@ jQuery(document).ready(function() {
         updateLoadingBar(progress);
 
         if (_MANIFEST.chunks.length > 0) {
-            setLoadingBarText("Progress: "+Math.round(progress*100)+" %");
+            setLoadingBarText("Uploading: "+Math.round(progress*100)+" %");
             uploadChunk();
         }
         else {
