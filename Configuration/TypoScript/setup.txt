@@ -36,16 +36,15 @@ bcConvertUploadController {
         pluginName = File
         vendorName = BC
         controller = File
-        action = handle
+        action = state
         switchableControllerActions {
             File {
-                1 = handle
-                2 = download
-                3 = upload
-                4 = state
-                5 = queueState
-                6 = convert
-                7 = transcodeList
+                1 = state
+                2 = queueState
+                3 = convert
+                4 = transcodeList
+                5 = uploadManifest
+                6 = uploadChunk
             }
         }
     }

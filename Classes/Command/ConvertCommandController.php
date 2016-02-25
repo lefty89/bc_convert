@@ -22,6 +22,12 @@ class ConvertCommandController extends CommandController {
 	protected $queueRepository;
 
 	/**
+	 * @var \BC\BcConvert\Domain\Repository\FileRepository
+	 * @inject
+	 */
+	protected $fileRepository;
+
+	/**
 	 * Converts the next video
 	 */
 	public function convertVideoCommand() {

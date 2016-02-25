@@ -188,12 +188,22 @@
 #bc-uploader div.bc-content div.bc-list {
   display: none;
 }
-/* line 213, ../../Private/Sass/style.scss */
+/* line 209, ../../Private/Sass/style.scss */
+#bc-uploader div.bc-content div.bc-list li {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* line 214, ../../Private/Sass/style.scss */
+#bc-uploader div.bc-content div.bc-list li a {
+  font-size: 14px;
+}
+/* line 223, ../../Private/Sass/style.scss */
 #bc-uploader div.bc-content div.circle-container {
   position: relative;
   text-align: center;
 }
-/* line 217, ../../Private/Sass/style.scss */
+/* line 227, ../../Private/Sass/style.scss */
 #bc-uploader div.bc-content div.circle-container strong {
   position: absolute;
   font-size: 16px;

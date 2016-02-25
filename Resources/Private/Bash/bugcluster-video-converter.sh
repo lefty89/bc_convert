@@ -17,6 +17,9 @@ DIR="${FULLPATH:0:${#FULLPATH} - ${#FILENAME}}" 	# Substring from 0 thru pos of 
 BASE="${FILENAME%.[^.]*}"                			# Strip shortest match of . plus at least one non-dot char from end
 EXT="${FILENAME:${#BASE} + 1}"            			# Substring from len of base thru end
 
+# transcode folder name
+TRANS_FOLDER="transcode/"
+
 
 # check whether format is valid
 if [ "$EXT" != "mp4" ] && [ "$EXT" != "webm" ] && [ "$EXT" != "ogv" ] ; then
@@ -40,4 +43,4 @@ case "$FORMAT" in
 esac
 
 
-bash -c "avconv -i ${FULLPATH} ${AUDIOQUALY} ${VIDEOQUALY} ${DIR}${BASE}.${NEW_EXT} 2>${DIR}log.txt"
+bash -c "avconv -i ${FULLPATH} ${AUDIOQUALY} ${VIDEOQUALY} ${DIR}${TRANS_FOLDER}${BASE}.${NEW_EXT} 2>${DIR}${TRANS_FOLDER}log.txt"

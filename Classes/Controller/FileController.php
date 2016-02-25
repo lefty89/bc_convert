@@ -12,7 +12,6 @@ namespace BC\BcConvert\Controller;
  */
 
 use BC\BcConvert\Utility\ConvertUtility;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 use TYPO3\CMS\Extbase\Property\TypeConverter\PersistentObjectConverter;
 
@@ -129,34 +128,6 @@ class FileController extends ActionController {
 	}
 
 	/**
-	 * show action
-	 */
-	public function handleAction() {
-
-		switch($_SERVER['HTTP_X_METHOD']) {
-			case '1': {
-				$this->getManifest();  break;}
-			case '2': {
-				$this->putFileChunk(); break;}
-		}
-	}
-
-	/**
-	 * show action
-	 */
-	public function downloadAction() {
-
-		if ($v = GeneralUtility::_GP("v")) {
-
-			/** @var \BC\BcConvert\Domain\Model\File $file */
-			$file = $this->fileRepository->findOneByHash($v);
-
-			// redirect to the file
-			if ($file) {$this->redirectToUri($file->getPath());}
-		}
-	}
-
-	/**
 	 * @param string $hash
 	 */
 	public function stateAction($hash)
@@ -194,7 +165,7 @@ class FileController extends ActionController {
 	/**
 	 * creates the manifest and returns the chunk list
 	 */
-	protected function getManifest()
+	public function uploadManifestAction()
 	{
 		/** @var array $data */
 		$data = array('chunks' => array());
@@ -209,7 +180,7 @@ class FileController extends ActionController {
 	/**
 	 * uploads a new file chunk
 	 */
-	protected function putFileChunk()
+	public function uploadChunkAction()
 	{
 		/** @var array $data */
 		$data = array('chunks' => array());

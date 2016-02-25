@@ -205,6 +205,16 @@ $spinner-color: #242424;
 
     div.bc-list {
       display: none;
+
+      li {
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+
+        a {
+          font-size: 14px;
+        }
+      }
     }
 
 

@@ -45,17 +45,15 @@ jQuery(document).ready(function() {
 
     function sendManifest()
     {
-        var url = jQuery('.file-drop').attr('data-url');
         var xhr = new XMLHttpRequest();
         var msg = JSON.stringify(_MANIFEST);
 
-        xhr.open('POST', url, true);
+        xhr.open('POST', TYPO3_BCCONVERT.MANIFEST_URL, true);
         xhr.responseType = 'text';
 
         // custom header
         xhr.setRequestHeader("X-Message-Size", msg.length);
         xhr.setRequestHeader("X-File-Hash", _FILE.hash);
-        xhr.setRequestHeader("X-Method", "1");
 
         // error handler
         xhr.upload.addEventListener('error', function(e) {
@@ -98,16 +96,14 @@ jQuery(document).ready(function() {
         var chunk = getRandomChunk();
         if (chunk === null) return;
 
-        var url = jQuery('.file-drop').attr('data-url');
         var xhr = new XMLHttpRequest();
 
-        xhr.open('POST', url, true);
+        xhr.open('POST', TYPO3_BCCONVERT.CHUNK_URL, true);
         xhr.responseType = 'text';
 
         // custom header
         xhr.setRequestHeader("X-Message-Size", chunk.blob.size);
         xhr.setRequestHeader("X-File-Hash",  _FILE.hash);
-        xhr.setRequestHeader("X-Method",  "2");
 
         // return value
         xhr.upload.addEventListener('load', function(e) {
@@ -174,7 +170,7 @@ jQuery(document).ready(function() {
     /**
      * WEBWORKER PART
      */
-    var workerUrl = jQuery('.file-drop').attr('data-worker');
+    var workerUrl = TYPO3_BCCONVERT.WORKER_JS;
     var worker = new Worker(workerUrl);
 
     // webworker callback

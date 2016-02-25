@@ -21,7 +21,7 @@ class FileUtility {
 	 * @param string $name
 	 * @return array
 	 */
-	private static function getSettings($name) {
+	public static function getSettings($name) {
 
 		/** @var \TYPO3\CMS\Extbase\Object\ObjectManager $objectManager */
 		$objectManager = GeneralUtility::makeInstance(ObjectManager::class);

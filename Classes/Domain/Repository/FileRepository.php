@@ -20,6 +20,60 @@ use TYPO3\CMS\Extbase\Persistence\Repository;
 class FileRepository extends Repository {
 
 	/**
+	 * @param \BC\BcConvert\Domain\Model\Queue $queue
+	 * @param array $data
+	 * @return boolean
+	 * @throws \TYPO3\CMS\Extbase\Persistence\Exception\IllegalObjectTypeException
+	 */
+	public function createFromQueue($queue, $data) {
+
+		if (is_file($data['path'])) {
+
+			// move and rename file
+			$hash = sha1_file($data['path']);
+
+			/** @var string $storagePath */
+			$storagePath = FileUtility::getSettings('fileStoragePath');
+
+			/** @var string $filename */
+			$filename = pathinfo($data['path'], PATHINFO_BASENAME);
+
+			/** @var string $relFileName */
+			$relFileName = $storagePath.$hash."/".$filename;
+
+			// create new folder
+			if (!is_dir(dirname(PATH_site.$relFileName))) {
+				mkdir(dirname(PATH_site.$relFileName), 0777, true);
+			}
+
+			if (rename($data['path'], PATH_site.$relFileName)) {
+
+				$file = new File();
+				$file->setHash($hash);
+
+				$file->setName($filename);
+				$file->setSize(filesize(PATH_site.$relFileName));
+
+				// get file mime
+				$finfo = finfo_open(FILEINFO_MIME_TYPE);
+				$mime = finfo_file($finfo, PATH_site.$relFileName);
+				finfo_close($finfo);
+
+				$file->setMime($mime);
+				$file->setPath($relFileName);
+
+				$mirror = $queue->getFile()->getMirror() ?: $queue->getFile()->getUid();
+				$file->setMirror($mirror);
+				$this->add($file);
+
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	/**
 	 * @param array $data
 	 * @param \BC\BcConvert\Domain\Model\File $file
 	 */

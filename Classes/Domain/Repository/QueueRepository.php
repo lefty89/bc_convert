@@ -10,6 +10,8 @@ namespace BC\BcConvert\Domain\Repository;
  */
 
 use BC\BcConvert\Utility\ConvertUtility;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
+use TYPO3\CMS\Extbase\Object\ObjectManager;
 use TYPO3\CMS\Extbase\Persistence\QueryInterface;
 use TYPO3\CMS\Extbase\Persistence\Repository;
 
@@ -33,6 +35,14 @@ class QueueRepository extends Repository {
 
 		if (array_key_exists('progress', $data) && (intval($data['progress']) === 100)) {
 
+			/** @var \TYPO3\CMS\Extbase\Object\ObjectManager $objectManager */
+			$objectManager = GeneralUtility::makeInstance(ObjectManager::class);
+
+			/** @var \BC\BcConvert\Domain\Repository\FileRepository $fileRepository */
+			$fileRepository = $objectManager->get(FileRepository::class);
+			$fileRepository->createFromQueue($queue, $data);
+
+			// mark queue as complete
 			$queue->setComplete(true);
 			$this->update($queue);
 

@@ -19,11 +19,11 @@ if (!defined('TYPO3_MODE')) {
 	'BC.'.$_EXTKEY,
 	'File',
 	array(
-		'File' => 'handle, download, upload, queueState, state, convert, transcodeList',
+		'File' => 'queueState, state, convert, transcodeList, uploadManidest, uploadChunk',
 	),
 	// non-cacheable actions
 	array(
-		'File' => 'handle, download, upload, queueState, state, convert, transcodeList'
+		'File' => 'queueState, state, convert, transcodeList, uploadManidest, uploadChunk'
 	)
 );
 

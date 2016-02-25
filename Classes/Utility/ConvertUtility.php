@@ -47,7 +47,7 @@ class ConvertUtility {
 	public static function parseCurrentProcess($file, &$data)
 	{
 		/** @var string $log */
-		$log = PATH_site.dirname($file->getPath())."/log.txt";
+		$log = PATH_site.dirname($file->getPath())."/transcode/log.txt";
 
 		if ($content = @file_get_contents($log)){
 
@@ -76,10 +76,18 @@ class ConvertUtility {
 			if (!empty($ar[1])) $time += intval($ar[1]) * 60;
 			if (!empty($ar[2])) $time += intval($ar[2]) * 60 * 60;
 
+			// parse output path
+			$output = array();
+			if (preg_match('/Output\s#0,\s(\w{1,3}),\sto\s\'([a-zA-Z0-9\/\._]*)\':/', $content, $output)) {
+				$data['ext']  = $output[1];
+				$data['path'] = $output[2];
+			}
+
 			// write to array
 			$data['progress'] = round(($time/$duration) * 100);
 			$data['duration'] = $duration;
 			$data['ctime'] = $time;
+
 		}
 	}
 
@@ -94,8 +102,13 @@ class ConvertUtility {
 		// necessary data
 		$hash = $queue->getFile()->getHash();
 		$path = PATH_site.$queue->getFile()->getPath();
+		$transPath = dirname($path).'/transcode';
 
-		//$name = pathinfo($queue->getFile()->getName(), PATHINFO_FILENAME);
+		// delete breaked files and recreate folder
+		if (file_exists($transPath)) {
+			array_map('unlink', glob("$transPath/*.*"));
+		}
+		mkdir($transPath, 0777, true);
 
 		// prepare shell script
 		$shell = sprintf("nohup bash %s %s %s %d >/dev/null 2>&1 &",

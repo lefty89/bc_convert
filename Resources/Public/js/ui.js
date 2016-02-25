@@ -85,7 +85,7 @@ function getTranscodeList()
             var ul = jQuery("<ul />").appendTo(list);
 
             for (k in data) {
-                jQuery("<a />", {href : data[k]['path'], text : data[k]['name'], target: '_blank'}).appendTo(ul);
+                ul.append(jQuery("<li />").append(jQuery("<a />", {href : data[k]['path'], text : data[k]['name'], target: '_blank'})));
             }
         }
         else {
