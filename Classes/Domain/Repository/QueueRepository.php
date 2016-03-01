@@ -24,7 +24,7 @@ class QueueRepository extends Repository {
 		$query = $this->createQuery();
 
 		$query->setOrderings(array(
-			'time' => QueryInterface::ORDER_DESCENDING)
+			'time' => QueryInterface::ORDER_ASCENDING)
 		);
 
 		// get only video files
