@@ -13,7 +13,7 @@ use TYPO3\CMS\Extbase\Service\TypoScriptService;
  */
 class FileUtility {
 
-	const COMPLETE_HASH = "0000000000000000000000000000000000000000";
+	const COMPLETE_HASH = "----------------------------------------";
 
 	/**
 	 * @param string $name
