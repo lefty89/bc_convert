@@ -15,5 +15,7 @@ plugin.tx_bcconvert {
     settings {
         # cat=plugin.tx_bcconvert//a; type=string; label=File storage path
         fileStoragePath = typo3temp/bugcluster/convert/
+        # cat=plugin.tx_bcconvert//a; type=string; label=Log file name
+        logFile = log.txt
     }
 }

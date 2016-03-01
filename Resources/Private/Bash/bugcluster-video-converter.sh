@@ -1,46 +1,48 @@
 #!/bin/bash
 
+############################################################
+# ./bugcluster-video-converter.sh {HASH} {FULLPATH} {FORMAT} {VIDEOBITRATE}
+############################################################
 
-# ./bugcluster-video-converter.sh {HASH} {FULLPATH} {FORMAT} {VIDEOQUALY} {AUDIOQUALY}
+# path settings
+HASH=${1}
+INFILE=${2}
+FORMAT=${3}
 
+# video input settings
+VIDEOBITRATE=${4}
+VIDEOWIDTH=${5}
+VIDEOHEIGHT=${6}
 
-HASH=$1
-FULLPATH=$2
-FORMAT=$3
+# audio input settings
+AUDIOBITRATE=${7}
+AUDIOQUALY=${8}
+AUDIOSAMPLERATE=${9}
 
-AUDIOQUALY="-acodec libvorbis -ac 2 -ab 96k -ar 44100"
-VIDEOQUALY="-b 345k -s 640x360"
+LOG=${10}
+OUTFILE=${11}
 
-# split name and path
-FILENAME="${FULLPATH##*/}"                      	# Strip longest match of */ from start
-DIR="${FULLPATH:0:${#FULLPATH} - ${#FILENAME}}" 	# Substring from 0 thru pos of filename
-BASE="${FILENAME%.[^.]*}"                			# Strip shortest match of . plus at least one non-dot char from end
-EXT="${FILENAME:${#BASE} + 1}"            			# Substring from len of base thru end
+# codecs
+VIDEOCODEC=""
+AUDIOCODEC=""
 
-# transcode folder name
-TRANS_FOLDER="transcode/"
-
-
-# check whether format is valid
-if [ "$EXT" != "mp4" ] && [ "$EXT" != "webm" ] && [ "$EXT" != "ogv" ] ; then
- exit 1
-fi
-
-# get new format
+# detect codecs
 case "$FORMAT" in
-"1")
-    NEW_EXT="ogv"
+"ogv")
+    VIDEOCODEC="libtheora"
+    AUDIOCODEC="libvorbis"
     ;;
-"2")
-    NEW_EXT="webm"
+"webm")
+    VIDEOCODEC="libvpx"
+    AUDIOCODEC="libvorbis"
     ;;
-"3")
-    NEW_EXT="mp4"
+"mp4")
+    VIDEOCODEC="libx264"
+    AUDIOCODEC="aac -strict experimental -ac ${AUDIOQUALY}"
     ;;
 *)
      exit 1
     ;;
 esac
 
-
-bash -c "avconv -i ${FULLPATH} ${AUDIOQUALY} ${VIDEOQUALY} ${DIR}${TRANS_FOLDER}${BASE}.${NEW_EXT} 2>${DIR}${TRANS_FOLDER}log.txt"
+bash -c "avconv -y -i ${INFILE} -acodec ${AUDIOCODEC} -b:a ${AUDIOBITRATE}k -ar ${AUDIOSAMPLERATE} -vcodec ${VIDEOCODEC} -b:v ${VIDEOBITRATE}k -s ${VIDEOWIDTH}x${VIDEOHEIGHT} ${OUTFILE} 2>${LOG}"

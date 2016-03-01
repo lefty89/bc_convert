@@ -2,17 +2,36 @@
       data-namespace-typo3-fluid="true">
 
 <div class="transcode-template">
-    <p>
-        <strong>Video quality:</strong>
-        <f:form.select class="videoBitrate" options="{1:'low', 2:'medium', 3:'hight'}" />
-    <p>
-        <strong>Audio quality:</strong>
-        <f:form.select class="audioBitrate" options="{1:'low', 2:'medium', 3:'hight'}" />
-    </p>
-    <p>
-        <strong>Formats:</strong>
-        <f:form.select class="format" options="{1:'mp4', 2:'webm', 3:'ogg'}" />
-    </p>
-    <button class="send">Absenden</button>
-
+    <f:form objectName="queue" controller="File" action="convert" pluginName="File" pageType="165237" noCacheHash="1" noCache="1" method="GET">
+        <f:form.hidden class="hash" name="hash" value="42" />
+        <p>
+            <strong>Bitrate (k):</strong>
+            <f:form.textfield  placeholder="Bitrate" type="number" additionalAttributes="{min:'1', max:'600'}" property="videoBitrate" value="600" />
+        </p>
+        <p>
+            <strong>Resolution:</strong>
+            <f:form.textfield class="small" placeholder="Width" type="number" additionalAttributes="{min:'1', max:'1920'}" property="videoWidth" value="640" />
+            <span class="cross">&#10060;</span>
+            <f:form.textfield class="small" placeholder="Height" type="number" additionalAttributes="{min:'1', max:'1920'}" property="videoHeight" value="480" />
+        </p>
+        <hr>
+        <p>
+            <strong>Bitrate (k):</strong>
+            <f:form.textfield placeholder="Bitrate" type="number" additionalAttributes="{min:'1', max:'96'}" property="audioBitrate" value="96" />
+        </p>
+        <p>
+            <strong>Sampling Rate:</strong>
+            <f:form.textfield placeholder="Sampling Rate" type="number" additionalAttributes="{min:'1', max:'48000'}" property="audioSamplingRate" value="48000" />
+        </p>
+        <p>
+            <strong>Channels:</strong>
+            <f:form.textfield placeholder="Channels" type="number" additionalAttributes="{min:'1', max:'10'}" property="audioChannels" value="5" />
+        </p>
+        <hr>
+        <p>
+            <strong>Formats:</strong>
+            <f:form.select property="format" options="{mp4:'mp4', webm:'webm', ogv:'ogv'}" />
+        </p>
+        <button type="submit" class="send">Absenden</button>
+    </f:form>
 </div>

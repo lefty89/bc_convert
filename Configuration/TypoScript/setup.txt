@@ -11,6 +11,7 @@ plugin.tx_bcconvert {
 	}
     settings {
         fileStoragePath = {$plugin.tx_bcconvert.settings.fileStoragePath}
+        logFile = {$plugin.tx_bcconvert.settings.logFile}
     }
 }
 

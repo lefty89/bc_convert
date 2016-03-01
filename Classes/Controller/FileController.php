@@ -48,33 +48,45 @@ class FileController extends ActionController {
 	 */
 	public function queueStateAction($hash) {
 
-		/** @var array $data */
-		$data = array();
-
+		/** @var array $output */
+		$output = array();
 		/** @var \BC\BcConvert\Domain\Model\Queue $queue */
 		$queue = $this->queueRepository->getOneQueueByFileHash($hash);
 
 		if ($queue !== NULL) {
 			// file is currently converting
 			if ($queue->getFile()->getHash() === ConvertUtility::isCurrentlyConverting()) {
+
+				// parse current converting process
+				$data = array();
+				ConvertUtility::parseCurrentProcess($data);
+
 				// sets converting state
-				$data['state'] = "converting";
-				$data['position'] = -1;
-				// sets current progress
-				ConvertUtility::parseCurrentProcess($queue->getFile(), $data);
+				$output['state']    = "converting";
+				$output['progress'] = $data['progress'];
+				$output['duration'] = $data['duration'];
+				$output['ctime']    = $data['ctime'];
 			}
 			else {
-				// sets the queue position
-				$data['state'] = "converting";
-				$data['position'] = $this->queueRepository->getQueuePosition($queue);
+				if (!$queue->getPath()) {
+					// sets the queue position
+					$output['state'] = "waiting";
+					if ($output['position'] = $this->queueRepository->getQueuePosition($queue)) {
+						// error handlnig for missing queue position
+					}
+				} else {
+					// if queue already had a path
+					// its only waiting for finalisation
+					$output['state'] = "finalize";
+				}
 			}
 		}
 		else {
 			// show dialog for new transcoding
-			$data['state'] = "transcodeable";
+			$output['state'] = "transcodeable";
 		}
 
-		$this->view->assign('value', $data);
+		$this->view->assign('value', $output);
 	}
 
 	/**
@@ -86,16 +98,6 @@ class FileController extends ActionController {
 
 			/** @var array $args */
 			$args = $this->request->getArguments();
-
-			if ($args['queue']['format']) {
-				$this->arguments['queue']->getPropertyMappingConfiguration()->allowProperties('format');
-			}
-			if ($args['queue']['videoBitrate']) {
-				$this->arguments['queue']->getPropertyMappingConfiguration()->allowProperties('videoBitrate');
-			}
-			if ($args['queue']['audioBitrate']) {
-				$this->arguments['queue']->getPropertyMappingConfiguration()->allowProperties('audioBitrate');
-			}
 
 			// allow creating of new object
 			$propertyMappingConfiguration = $this->arguments['queue']->getPropertyMappingConfiguration();
@@ -116,29 +118,11 @@ class FileController extends ActionController {
 
 		if ($file !== NULL) {
 			$queue->setFile($file);
-			$queue->setTime(new \DateTime());
+			$queue->setTime(new \DateTime("now"));
 			$this->queueRepository->add($queue);
 
 			// set state
-			$data['state'] 	  = "converting";
-			$data['position'] = -1;
-		}
-
-		$this->view->assign('value', $data);
-	}
-
-	/**
-	 * @param string $hash
-	 */
-	public function stateAction($hash)
-	{
-		$data = array();
-
-		/** @var \BC\BcConvert\Domain\Model\File $file */
-		$file = $this->fileRepository->findOneByHash($hash);
-
-		if ($file !== NULL) {
-			ConvertUtility::parseCurrentProcess($file, $data);
+			$data['state'] = "waiting";
 		}
 
 		$this->view->assign('value', $data);

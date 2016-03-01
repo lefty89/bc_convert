@@ -9,48 +9,10 @@ namespace BC\BcConvert\Domain\Repository;
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  */
 
-use BC\BcConvert\Utility\ConvertUtility;
-use TYPO3\CMS\Core\Utility\GeneralUtility;
-use TYPO3\CMS\Extbase\Object\ObjectManager;
 use TYPO3\CMS\Extbase\Persistence\QueryInterface;
 use TYPO3\CMS\Extbase\Persistence\Repository;
 
 class QueueRepository extends Repository {
-
-	/**
-	 * @param \BC\BcConvert\Domain\Model\Queue $queue
-	 * @return bool
-	 * @throws \TYPO3\CMS\Extbase\Persistence\Exception\IllegalObjectTypeException
-	 */
-	public function convertingIsFinished($queue)
-	{
-		/** @var array $data */
-		$data = array();
-
-		/** @var \BC\BcConvert\Domain\Model\File $file */
-		$file = $queue->getFile();
-
-		// parse the progress of the given queue item
-		ConvertUtility::parseCurrentProcess($file, $data);
-
-		if (array_key_exists('progress', $data) && (intval($data['progress']) === 100)) {
-
-			/** @var \TYPO3\CMS\Extbase\Object\ObjectManager $objectManager */
-			$objectManager = GeneralUtility::makeInstance(ObjectManager::class);
-
-			/** @var \BC\BcConvert\Domain\Repository\FileRepository $fileRepository */
-			$fileRepository = $objectManager->get(FileRepository::class);
-			$fileRepository->createFromQueue($queue, $data);
-
-			// mark queue as complete
-			$queue->setComplete(true);
-			$this->update($queue);
-
-			return true;
-		}
-
-		return false;
-	}
 
 	/**
 	 * gets the next video added to queue
@@ -87,7 +49,7 @@ class QueueRepository extends Repository {
 		$query = $this->createQuery();
 
 		$query->setOrderings(array(
-			'time' => QueryInterface::ORDER_DESCENDING)
+			'time' => QueryInterface::ORDER_ASCENDING)
 		);
 
 		// get only video files
@@ -104,10 +66,10 @@ class QueueRepository extends Repository {
 
 		/** @var  $v */
 		foreach ($queuedItems as $key => $value) {
-			if (intval($value['uid']) === $queue->getUid()) return $key;
+			if (intval($value['uid']) === $queue->getUid()) return $key + 1;
 		}
 
-		return -1;
+		return 0;
 	}
 
 

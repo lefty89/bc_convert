@@ -21,21 +21,10 @@ use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 class InfoController extends ActionController {
 
 	/**
-	 * fileRepository
-	 *
-	 * @var \BC\BcConvert\Domain\Repository\FileRepository
-	 * @inject
-	 */
-	protected $fileRepository;
-
-	/**
 	 * show action
 	 */
 	public function showAction() {
-
 		$this->addResources();
-
-		$this->view->assign('files', $this->fileRepository->findByComplete(true));
 	}
 
 	/**

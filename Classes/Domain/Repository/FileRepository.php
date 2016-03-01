@@ -21,53 +21,43 @@ class FileRepository extends Repository {
 
 	/**
 	 * @param \BC\BcConvert\Domain\Model\Queue $queue
-	 * @param array $data
 	 * @return boolean
 	 * @throws \TYPO3\CMS\Extbase\Persistence\Exception\IllegalObjectTypeException
 	 */
-	public function createFromQueue($queue, $data) {
+	public function createFromQueue($queue) {
 
-		if (is_file($data['path'])) {
+		/** @var string $completePath */
+		$completePath = GeneralUtility::getFileAbsFileName($queue->getPath());
+
+		if (is_file($completePath)) {
 
 			// move and rename file
-			$hash = sha1_file($data['path']);
+			$hash = sha1_file($completePath);
 
-			/** @var string $storagePath */
-			$storagePath = FileUtility::getSettings('fileStoragePath');
+			$file = new File();
+			$file->setHash($hash);
 
 			/** @var string $filename */
-			$filename = pathinfo($data['path'], PATHINFO_BASENAME);
+			$filename = pathinfo($queue->getFile()->getName(), PATHINFO_FILENAME) . "." . $queue->getFormat();
 
-			/** @var string $relFileName */
-			$relFileName = $storagePath.$hash."/".$filename;
+			$file->setPid($queue->getFile()->getPid());
+			$file->setName($filename);
+			$file->setSize(filesize($completePath));
+			$file->setComplete(true);
 
-			// create new folder
-			if (!is_dir(dirname(PATH_site.$relFileName))) {
-				mkdir(dirname(PATH_site.$relFileName), 0777, true);
-			}
+			// get file mime
+			$finfo = finfo_open(FILEINFO_MIME_TYPE);
+			$mime = finfo_file($finfo, $completePath);
+			finfo_close($finfo);
 
-			if (rename($data['path'], PATH_site.$relFileName)) {
+			$file->setMime($mime);
+			$file->setPath($queue->getPath());
 
-				$file = new File();
-				$file->setHash($hash);
+			$mirror = $queue->getFile()->getMirror() ?: $queue->getFile()->getUid();
+			$file->setMirror($mirror);
+			$this->add($file);
 
-				$file->setName($filename);
-				$file->setSize(filesize(PATH_site.$relFileName));
-
-				// get file mime
-				$finfo = finfo_open(FILEINFO_MIME_TYPE);
-				$mime = finfo_file($finfo, PATH_site.$relFileName);
-				finfo_close($finfo);
-
-				$file->setMime($mime);
-				$file->setPath($relFileName);
-
-				$mirror = $queue->getFile()->getMirror() ?: $queue->getFile()->getUid();
-				$file->setMirror($mirror);
-				$this->add($file);
-
-				return true;
-			}
+			return true;
 		}
 
 		return false;
@@ -129,7 +119,7 @@ class FileRepository extends Repository {
 
 			if ($file === NULL) {
 				// create a new file on the file system
-				$path = FileUtility::createPersistentFile($hash, $manifest);
+				$path = FileUtility::createPersistentFile($manifest);
 				// create a new file in the typo3 db
 				$this->createFileDbEntry($path, $hash, $manifest);
 				$data['chunks'] = $manifest->chunks;

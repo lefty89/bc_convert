@@ -1,9 +1,4 @@
 
-$offline-color: #F22;
-$online-color: #506E40;
-
-
-
 $header-color: #323232;
 $spinner-color: #242424;
 
@@ -11,7 +6,6 @@ $spinner-color: #242424;
 #bc-uploader {
   background-color: $header-color;
   border: 3px solid black;
-  width: 60%;
 
   ul.bc-controls {
     list-style: none;
@@ -178,17 +172,43 @@ $spinner-color: #242424;
         div.transcode-template {
 
           p {
-            padding: 0px 0px 5px;
+            padding: 0 0 5px;
+            clear: both;
 
             strong {
-              display: inline-block;
+              float: left;
               width: 30%;
             }
 
             select {
               padding: 2px;
-              width: 65%;
+              width: 70%;
+              box-sizing: border-box;
             }
+
+            input {
+              width: 70%;
+              padding: 2px;
+              float: left;
+              box-sizing: border-box;
+
+              &.small {
+                width: 25%;
+              }
+            }
+
+            span.cross {
+              float: left;
+              width: 20%;
+              text-align: center;
+            }
+          }
+
+          hr {
+            clear: both;
+            margin: 22px 0 5px;
+            color: rgb(0, 0, 0);
+            border: 1px solid rgb(93, 93, 93);
           }
 
           button.send {
@@ -224,6 +244,11 @@ $spinner-color: #242424;
       position: relative;
       text-align: center;
 
+      canvas {
+        width: 50%;
+        height: 50%;
+      }
+
       strong {
         position: absolute;
         font-size: 16px;
@@ -231,6 +256,7 @@ $spinner-color: #242424;
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);
+        width: 150px;
       }
     }
   }

@@ -3,6 +3,7 @@
 namespace BC\BcConvert\Command;
 
 use BC\BcConvert\Utility\ConvertUtility;
+use TYPO3\CMS\Core\Utility\GeneralUtility;
 use TYPO3\CMS\Extbase\Mvc\Controller\CommandController;
 
 class ConvertCommandController extends CommandController {
@@ -33,12 +34,36 @@ class ConvertCommandController extends CommandController {
 	public function convertVideoCommand() {
 
 		if (ConvertUtility::isCurrentlyConverting() === NULL) {
-
 			/** @var \BC\BcConvert\Domain\Model\Queue $queue */
 			$queue = $this->queueRepository->getNextItem()->getFirst();
 
-			if (($queue !== NULL) && (!$this->queueRepository->convertingIsFinished($queue))) {
-				ConvertUtility::startConvertingVideo($queue);
+			if ($queue !== NULL) {
+				// check whether a transcoding is possible with the
+				// given parameters
+				if (ConvertUtility::isTranscodedFileValid($queue)) {
+
+					// parse the progress of the given queue item
+					$data = array();
+					ConvertUtility::parseCurrentProcess($data);
+
+					if (ConvertUtility::isConvertionFinished($queue)) {
+						// mark queue as complete
+						$queue->setComplete(true);
+						// create new file
+						$this->fileRepository->createFromQueue($queue, $data);
+					}
+					else {
+						ConvertUtility::startConvertingVideo($queue);
+					}
+					$this->queueRepository->update($queue);
+				}
+				else {
+
+					// delete corrupted queue
+					$this->queueRepository->remove($queue);
+					// remove file
+					unlink(GeneralUtility::getFileAbsFileName($queue->getPath()));
+				}
 			}
 		}
 	}

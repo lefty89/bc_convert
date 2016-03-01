@@ -16,6 +16,37 @@ class FileUtility {
 	const COMPLETE_HASH = "0000000000000000000000000000000000000000";
 
 	/**
+	 * @param string $name
+	 * @param string $suffix
+	 * @return string
+	 */
+	public static function createTempFileInFolder($name, $suffix) {
+
+		/** @var string $storagePath */
+		$storagePath = FileUtility::getSettings('fileStoragePath');
+
+		/** @var string $cleanName */
+		$cleanName = preg_replace('/[^a-zA-Z0-9-_\.]/','_', $name);
+
+		// create folder if not existing
+		if (!is_dir($storagePath)) {
+			mkdir($storagePath, 0755, true);
+		}
+
+		do
+		{
+			/** @var string $file */
+			$file = $storagePath.$cleanName."_".substr(str_shuffle(md5(time())),0, 5).".".$suffix;
+
+			$fp = @fopen($file, 'x');
+		}
+		while(!$fp);
+
+		fclose($fp);
+		return $file;
+	}
+
+	/**
 	 * get full typoscript settings for this extension
 	 *
 	 * @param string $name
@@ -58,53 +89,38 @@ class FileUtility {
 	}
 
 	/**
-	 * @param string $hash
 	 * @param Object $manifest
 	 * @return string
 	 */
-	public static function createPersistentFile($hash, $manifest) {
-
-		/** @var string $storagePath */
-		$storagePath = FileUtility::getSettings('fileStoragePath');
-
-		// create directory if not existing
-		$dir = $storagePath.$hash."/";
-		if (!is_dir($dir)) mkdir($dir, 0777, true);
-
-		// clean file name
-		$cleanName = preg_replace('/[^a-zA-Z0-9-_\.]/','_', $manifest->name);
+	public static function createPersistentFile($manifest) {
 
 		// concat temp filename
-		$filename = $dir.$cleanName.".temp";
+		$filename = FileUtility::createTempFileInFolder(pathinfo($manifest->name, PATHINFO_FILENAME), pathinfo($manifest->name, PATHINFO_EXTENSION));
 
-		// save file
-		if (!file_exists($filename)) {
+		// open in write mode.
+		$fp = fopen($filename, 'w');
 
-			// open in write mode.
-			$fp = fopen($filename, 'w');
+		// lock file
+		if (flock($fp, LOCK_EX)) {
 
-			// lock file
-			if (flock($fp, LOCK_EX)) {
+			// write manifest
+			$man = json_encode($manifest) . PHP_EOL;
+			fwrite($fp, $man, strlen($man));
+			fflush($fp);
 
-				// write manifest
-				$man = json_encode($manifest) . PHP_EOL;
-				fwrite($fp, $man, strlen($man));
-				fflush($fp);
+			// buffer file size
+			$size = intval($manifest->size) + strlen($man);
 
-				// buffer file size
-				$size = intval($manifest->size) + strlen($man);
-
-				// write dummy content
-				fseek($fp, $size-1, SEEK_SET);
-				fwrite($fp, 'a');
-				fflush($fp);
-				// unlock file
-				flock($fp, LOCK_UN);
-			}
-
-			// close file
-			fclose($fp);
+			// write dummy content
+			fseek($fp, $size-1, SEEK_SET);
+			fwrite($fp, 'a');
+			fflush($fp);
+			// unlock file
+			flock($fp, LOCK_UN);
 		}
+
+		// close file
+		fclose($fp);
 
 		return $filename;
 	}
@@ -221,22 +237,12 @@ class FileUtility {
 		else throw new Exception('File could not be opened');
 
 		// validate complete file
-		if ((!is_file($file->getPath())) || ($hash !== sha1_file($file->getPath()))) {
-			throw new Exception('File is not valid');
-		}
-
-		/** @var string $filename */
-		$filename = substr($file->getPath(), 0, strrpos($file->getPath(), "."));
-
-		// rename file to its original name
-		if (rename($file->getPath(), $filename)) {
+		if ((is_file($file->getPath())) && ($hash == sha1_file($file->getPath()))) {
+			// mark file as complete
 			$file->setComplete(true);
-			$file->setPath($filename);
+		} else throw new Exception('File is not valid');
 
-			return true;
-		}
-
-		return false;
+		return true;
 	}
 
 }

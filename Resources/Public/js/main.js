@@ -3,10 +3,6 @@ jQuery(document).ready(function() {
     var _FILE = null;
     var _MANIFEST = null;
 
-    jQuery('.file-selctor').change(function(e) {
-
-    });
-
     jQuery('.file-drop').on('dragover', function(e) {
         e.preventDefault();
         e.stopPropagation();
@@ -162,7 +158,7 @@ jQuery(document).ready(function() {
         else {
             setLoadingBarText("Upload finished");
             setBannerLink(data.link, _FILE.hash);
-            enableTabs(true, Boolean(data.cable), true);
+            enableTabs(true, Boolean(data.cable), Boolean(data.cable));
         }
     }
 
@@ -170,8 +166,7 @@ jQuery(document).ready(function() {
     /**
      * WEBWORKER PART
      */
-    var workerUrl = TYPO3_BCCONVERT.WORKER_JS;
-    var worker = new Worker(workerUrl);
+    var worker = new Worker(TYPO3_BCCONVERT.WORKER_JS);
 
     // webworker callback
     worker.onmessage = function(e) {

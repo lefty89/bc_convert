@@ -10,10 +10,11 @@ return array(
 		'tstamp' => 'tstamp',
 		'crdate' => 'crdate',
 		'cruser_id' => 'cruser_id',
+		'delete' => 'deleted',
 		'dividers2tabs' => TRUE,
 
 		'searchFields' => 'name,',
-		'iconfile' => \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extRelPath('bc_convert') . 'Resources/Public/Icons/entity.gif'
+		'iconfile' => \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extRelPath('bc_convert') . 'Resources/Public/Icons/file.svg'
 	),
 	'interface' => array(
 		'showRecordFieldList' => 'name, hash, mime, size, complete, path, mirror',

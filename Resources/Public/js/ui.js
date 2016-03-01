@@ -1,21 +1,18 @@
 jQuery(document).ready(function() {
-
     // tabs switcher
     jQuery('#bc-uploader .bc-controls li').click(switchTabs);
     // send queue
-    jQuery('#bc-uploader .transcode-template .send').click(sendQueue);
-
-
+    jQuery('#bc-uploader .transcode-template form').submit(sendQueue);
+    // circle lib
     jQuery('.circle-container').circleProgress({
         animation: false,
         startAngle: -Math.PI/2,
         value: 0,
-        size: 200,
+        size: 1000,
         fill: {
             gradient: ['#ff1e41', '#ff5f43']
         }
     });
-
 });
 
 /**
@@ -27,17 +24,14 @@ var _TRANSCODE_TIMEOUT = null;
 /**
  * send new queue
  */
-function sendQueue()
+function sendQueue(event)
 {
-    jQuery.getJSON('/', {
-        'tx_bcconvert_file[action]':                'convert',
-        'tx_bcconvert_file[controller]':            'File',
-        'tx_bcconvert_file[hash]':                  jQuery('#bc-uploader .bc-banner').attr('title'),
-        'tx_bcconvert_file[queue][format]':         jQuery('#bc-uploader .transcode-template .format').val(),
-        'tx_bcconvert_file[queue][videoBitrate]':   jQuery('#bc-uploader .transcode-template .videoBitrate').val(),
-        'tx_bcconvert_file[queue][audioBitrate]':   jQuery('#bc-uploader .transcode-template .audioBitrate').val(),
-        'type':                                     165237
-    }, transcodeResponse);
+    event.preventDefault();
+
+    var url  = jQuery('.transcode-template form').attr('action');
+    var data = jQuery('.transcode-template form').serializeArray().reduce(function(obj, item) {obj[item.name] = item.value; return obj;}, {});
+
+    jQuery.getJSON(url, data, transcodeResponse);
 }
 
 /**
@@ -49,7 +43,12 @@ function transcodeResponse(json)
     switch(json.state) {
         case 'transcodeable': showTranscodeForm(json); break;
         case 'converting': showConvertingState(json); break;
+        case 'waiting': showConvertingPosition(json); break;
+        case 'finalize': showFinalisationMessage(json); break;
     }
+
+    // restart checking
+    _TRANSCODE_TIMEOUT = setTimeout(function(){ getQueueState(); }, 10000);
 }
 
 /**
@@ -96,34 +95,56 @@ function getTranscodeList()
 }
 
 /**
+ * show finalisation message
+ * @param {array} json
+ */
+function showFinalisationMessage(json) {
+
+    jQuery('.bc-content .bc-transcode .spinner').hide();
+    jQuery('.bc-content .bc-transcode .form').hide();
+    jQuery('.bc-content .bc-transcode .progress').show();
+
+    // currently waiting in queue
+    jQuery('#bugcluster-video-converter .bc-content .bc-transcode .progress .circle-container strong').text(function(){
+        return  "Waiting for file finalisation";
+
+    });
+    jQuery('#bugcluster-video-converter .bc-content .bc-transcode .progress .circle-container').circleProgress('value', 100);
+}
+
+/**
+ * show current conversion position
+ * @param {array} json
+ */
+function showConvertingPosition(json) {
+
+    jQuery('.bc-content .bc-transcode .spinner').hide();
+    jQuery('.bc-content .bc-transcode .form').hide();
+    jQuery('.bc-content .bc-transcode .progress').show();
+
+    // currently waiting in queue
+    jQuery('#bugcluster-video-converter .bc-content .bc-transcode .progress .circle-container strong').text(function(){
+        return  ('position' in json) ? ("Position: " + json.position) : "Get queue position";
+
+    });
+    jQuery('#bugcluster-video-converter .bc-content .bc-transcode .progress .circle-container').circleProgress('value', 0);
+}
+
+/**
  * show current conversion state
  * @param {array} json
  */
 function showConvertingState(json)
 {
-    jQuery('.bc-content .spinner').hide();
-    jQuery('.bc-content .form').hide();
-    jQuery('.bc-content .progress').show();
+    jQuery('.bc-content .bc-transcode .spinner').hide();
+    jQuery('.bc-content .bc-transcode .form').hide();
+    jQuery('.bc-content .bc-transcode .progress').show();
 
-
-    if (json.progress !== undefined) {
-        // currently converting my file
-        jQuery('#bugcluster-video-converter .bc-content .bc-transcode .progress .circle-container strong').html(function(){
-            return  "Progress: " + json.progress + " % <br> Duration: " + secondsToHms(parseFloat(json.duration)) + " <br> Time: "  + secondsToHms(parseFloat(json.ctime));
-        });
-        jQuery('#bugcluster-video-converter .bc-content .bc-transcode .progress .circle-container').circleProgress('value', (parseInt(json.progress)/100));
-    }
-    else {
-        // currently waiting in queue
-        jQuery('#bugcluster-video-converter .bc-content .bc-transcode .progress .circle-container strong').text(function(){
-            return  (parseInt(json.position) == -1) ? "Get queue position" : ("Position: " + json.position);
-
-        });
-        jQuery('#bugcluster-video-converter .bc-content .bc-transcode .progress .circle-container').circleProgress('value', 0);
-    }
-
-    // restart checking
-    _TRANSCODE_TIMEOUT = setTimeout(function(){ getQueueState(); }, 10000);
+    // currently converting my file
+    jQuery('#bugcluster-video-converter .bc-content .bc-transcode .progress .circle-container strong').html(function(){
+        return  "Progress: " + json.progress + " % <br> Duration: " + secondsToHms(parseFloat(json.duration)) + " <br> Time: "  + secondsToHms(parseFloat(json.ctime));
+    });
+    jQuery('#bugcluster-video-converter .bc-content .bc-transcode .progress .circle-container').circleProgress('value', (parseInt(json.progress)/100));
 }
 
 /**
@@ -131,9 +152,9 @@ function showConvertingState(json)
  */
 function showTranscodeForm()
 {
-    jQuery('.bc-content .spinner').hide();
-    jQuery('.bc-content .progress').hide();
-    jQuery('.bc-content .form').show();
+    jQuery('.bc-content .bc-transcode .spinner').hide();
+    jQuery('.bc-content .bc-transcode .progress').hide();
+    jQuery('.bc-content .bc-transcode .form').show();
 }
 
 /**
@@ -189,6 +210,10 @@ function setBannerLink(path, hash)
     banner.show();
     banner.attr('title', hash);
     banner.find('.filelink').attr('href', path);
+
+
+    // temporarry
+    jQuery('#bc-uploader .transcode-template .hash ').val(hash);
 }
 
 /**

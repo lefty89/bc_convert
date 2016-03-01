@@ -10,16 +10,17 @@ return array(
 		'tstamp' => 'tstamp',
 		'crdate' => 'crdate',
 		'cruser_id' => 'cruser_id',
+		'delete' => 'deleted',
 		'dividers2tabs' => TRUE,
 
 		'searchFields' => 'file,',
-		'iconfile' => \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extRelPath('bc_convert') . 'Resources/Public/Icons/entity.gif'
+		'iconfile' => \TYPO3\CMS\Core\Utility\ExtensionManagementUtility::extRelPath('bc_convert') . 'Resources/Public/Icons/file.svg'
 	),
 	'interface' => array(
-		'showRecordFieldList' => 'file, video_bitrate, audio_bitrate, format, time, complete',
+		'showRecordFieldList' => 'file, video_bitrate, video_width, video_height, audio_bitrate, audio_sampling_rate, audio_channels, format, time, complete, path',
 	),
 	'types' => array(
-		'1' => array('showitem' => 'file, video_bitrate, audio_bitrate, format, time, complete'),
+		'1' => array('showitem' => 'file, video_bitrate, video_width, video_height, audio_bitrate, audio_sampling_rate, audio_channels, format, time, complete, path'),
 	),
 	'palettes' => array(
 		'1' => array('showitem' => ''),
@@ -44,7 +45,39 @@ return array(
 				'eval' => 'int'
 			),
 		),
+		'video_width' => Array (
+			'exclude' => 0,
+			'label' => 'video_bitrate',
+			'config' => array(
+				'type' => 'input',
+				'eval' => 'int'
+			),
+		),
+		'video_height' => Array (
+			'exclude' => 0,
+			'label' => 'video_bitrate',
+			'config' => array(
+				'type' => 'input',
+				'eval' => 'int'
+			),
+		),
 		'audio_bitrate' => Array (
+			'exclude' => 0,
+			'label' => 'video_bitrate',
+			'config' => array(
+				'type' => 'input',
+				'eval' => 'int'
+			),
+		),
+		'audio_sampling_rate' => Array (
+			'exclude' => 0,
+			'label' => 'video_bitrate',
+			'config' => array(
+				'type' => 'input',
+				'eval' => 'int'
+			),
+		),
+		'audio_channels' => Array (
 			'exclude' => 0,
 			'label' => 'video_bitrate',
 			'config' => array(
@@ -57,19 +90,18 @@ return array(
 			'label' => 'format',
 			'config' => array(
 				'type' => 'input',
-				'eval' => 'int'
 			),
 		),
 		'time' => Array (
 			'exclude' => 0,
 			'label' => 'Queue time',
 			'config' => Array (
+				'dbType' => 'datetime',
 				'type' => 'input',
-				'size' => 13,
-				'max' => 20,
+				'size' => 12,
 				'eval' => 'datetime',
 				'checkbox' => 0,
-				'default' => 0,
+				'default' => '0000-00-00 00:00:00'
 			)
 		),
 		'complete' => array(
@@ -79,6 +111,13 @@ return array(
 				'type' => 'check',
 				'default' => 0
 			)
+		),
+		'path' => Array (
+			'exclude' => 0,
+			'label' => 'path',
+			'config' => array(
+				'type' => 'input',
+			),
 		),
 	),
 );

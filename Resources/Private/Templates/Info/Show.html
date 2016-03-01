@@ -4,7 +4,6 @@
 <f:layout name="Default"/>
 
 <f:section name="Main">
-
     <div id="bc-uploader">
         <div class="bc-banner">
             <a class="filelink" target="_blank">
@@ -25,7 +24,6 @@
                     </div>
                 </div>
             </div>
-
             <div data-index="2" class="bc-transcode">
                 <div class="spinner">
                     <div class="loader"></div>
@@ -43,7 +41,6 @@
             <div data-index="3" class="bc-list">
                 <p>Liste</p>
             </div>
-
         </div>
         <ul class="bc-controls">
             <li data-index="1" class="upload">Upload</li>
@@ -51,26 +48,4 @@
             <li data-index="3" class="list disabled">List</li>
         </ul>
     </div>
-
-
-
-
-
-
-    <ul>
-        <f:for each="{files}" as="file">
-            <li>
-                <f:link.action target="_blank" action="download" controller="File" pluginName="File" pageType="165237" additionalParams="{v:'{file.hash}'}">
-                    {file.name}
-                </f:link.action>
-                <f:link.action action="prepare" arguments="{file: file}">
-                   CONVERT
-                </f:link.action>
-                <f:link.action target="_blank" action="state" controller="File" pluginName="File" pageType="165237" arguments="{hash: file.hash}">
-                    STATE
-                </f:link.action>
-            </li>
-        </f:for>
-    </ul>
-
 </f:section>
