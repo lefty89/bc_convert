@@ -26,17 +26,17 @@ class ConvertUtility {
 	 * @param \BC\BcConvert\Domain\Model\Queue $queue
 	 * @return boolean
 	 */
-	public static function isTranscodedFileValid($queue)
+	public static function isTranscodedFileBroken($queue)
 	{
 		if (!empty($queue->getPath())) {
 
 			/** @var string $completePath */
 			$completePath = GeneralUtility::getFileAbsFileName($queue->getPath());
 
-			return (file_exists($completePath) && (filesize($completePath) > 0));
+			return (file_exists($completePath) && (filesize($completePath) === 0));
 		}
 
-		return true;
+		return false;
 	}
 
 	/**

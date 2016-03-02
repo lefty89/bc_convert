@@ -40,8 +40,13 @@ class ConvertCommandController extends CommandController {
 			if ($queue !== NULL) {
 				// check whether a transcoding is possible with the
 				// given parameters
-				if (ConvertUtility::isTranscodedFileValid($queue)) {
-
+				if (ConvertUtility::isTranscodedFileBroken($queue)) {
+					// delete corrupted queue
+					$this->queueRepository->remove($queue);
+					// remove file
+					unlink(GeneralUtility::getFileAbsFileName($queue->getPath()));
+				}
+				else {
 					// parse the progress of the given queue item
 					$data = array();
 					ConvertUtility::parseCurrentProcess($data);
@@ -56,13 +61,6 @@ class ConvertCommandController extends CommandController {
 						ConvertUtility::startConvertingVideo($queue);
 					}
 					$this->queueRepository->update($queue);
-				}
-				else {
-
-					// delete corrupted queue
-					$this->queueRepository->remove($queue);
-					// remove file
-					unlink(GeneralUtility::getFileAbsFileName($queue->getPath()));
 				}
 			}
 		}
