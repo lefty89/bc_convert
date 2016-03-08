@@ -16,12 +16,3 @@ TYPO3\CMS\Core\Utility\ExtensionManagementUtility::addPiFlexFormValue($extension
 	'Info',
 	'Bugcluster Video Converter'
 );
-
-/**
- * Data exchange interface
- */
-\TYPO3\CMS\Extbase\Utility\ExtensionUtility::registerPlugin(
-	'BC.'.$_EXTKEY,
-	'File',
-	'Bugcluster Video Upload Interface'
-);
