@@ -2,22 +2,34 @@
 
 namespace BC\BcConvert\Controller;
 
-/**
+/***************************************************************
+ *  Copyright notice
  *
- * User: Lefty
- * Date: 31.01.2015
- * Time: 13:21
+ *  (C) 2016 Lefty (fb.lefty@web.de)
  *
- * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
- */
-
+ *  This script is part of the Typo3 project. The Typo3 project is
+ *  free software; you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation; either version 2 of the License, or
+ *  (at your option) any later version.
+ *
+ *  This script is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with this script. If not, see <http://www.gnu.org/licenses/>.
+ *
+ ***************************************************************/
 use BC\BcConvert\Utility\ConvertUtility;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 use TYPO3\CMS\Extbase\Property\TypeConverter\PersistentObjectConverter;
 
 /**
- * Class InfoController
- * @package BC\BcMediastream\Controller
+ * @author Lefty (fb.lefty@web.de)
+ * @package TYPO3
+ * @subpackage bc_convert
  */
 class FileController extends ActionController {
 
