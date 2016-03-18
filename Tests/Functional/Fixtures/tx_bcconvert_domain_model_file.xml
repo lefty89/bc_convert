@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<dataset>
+
+    <tx_bcconvert_domain_model_file>
+        <uid>1</uid>
+        <pid>1</pid>
+        <mime>video/mp4</mime>
+    </tx_bcconvert_domain_model_file>
+
+    <tx_bcconvert_domain_model_file>
+        <uid>2</uid>
+        <pid>1</pid>
+        <mime>video/webm</mime>
+    </tx_bcconvert_domain_model_file>
+
+    <tx_bcconvert_domain_model_file>
+        <uid>3</uid>
+        <pid>1</pid>
+        <mime>video/webm</mime>
+    </tx_bcconvert_domain_model_file>
+
+</dataset>

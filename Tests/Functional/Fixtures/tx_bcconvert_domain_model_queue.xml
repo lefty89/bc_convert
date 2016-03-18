@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<dataset>
+
+    <tx_bcconvert_domain_model_queue>
+        <uid>1</uid>
+        <pid>1</pid>
+        <file>1</file>
+        <complete>1</complete>
+        <time>2016-01-05 10:00:00</time>
+        <path>/var/www/hello.mp4</path>
+    </tx_bcconvert_domain_model_queue>
+
+    <tx_bcconvert_domain_model_queue>
+        <uid>2</uid>
+        <pid>1</pid>
+        <file>2</file>
+        <complete>0</complete>
+        <time>2016-01-06 10:00:00</time>
+        <path>/var/www/world.mp4</path>
+    </tx_bcconvert_domain_model_queue>
+
+</dataset>

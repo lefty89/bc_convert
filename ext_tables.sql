@@ -35,7 +35,7 @@ CREATE TABLE tx_bcconvert_domain_model_queue (
     file int(11) DEFAULT '0' NOT NULL,
     format varchar(10) DEFAULT '' NOT NULL,
     complete tinyint(1) DEFAULT '0' NOT NULL,
-    time datetime DEFAULT '0000-00-00 00:00:00',
+    time datetime DEFAULT NULL,
     path varchar(255) DEFAULT '' NOT NULL,
 
     video_bitrate int(11) DEFAULT '0' NOT NULL,
