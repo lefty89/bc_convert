@@ -1,0 +1,52 @@
+{
+  "name": "lefty89/bc_convert",
+  "type": "typo3-cms-extension",
+  "description": "",
+  "keywords": [
+    "TYPO3",
+    "extension"
+  ],
+  "authors": [
+    {
+      "name": "Lefty",
+      "role": "Developer"
+    }
+  ],
+  "license": [
+    "GPL-2.0+"
+  ],
+  "require": {
+    "typo3/cms": ">=7.6.0,<8.0"
+  },
+  "require-dev": {
+    "phpunit/phpunit": "~4.8.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "BC\\BcConvert\\": "Classes"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "BC\\BcConvert\\Tests\\": "Tests",
+      "TYPO3\\CMS\\Core\\Tests\\": ".Build/vendor/typo3/cms/typo3/sysext/core/Tests/",
+      "TYPO3\\CMS\\Fluid\\Tests\\": ".Build/vendor/typo3/cms/typo3/sysext/fluid/Tests/"
+    }
+  },
+  "config": {
+    "vendor-dir": ".Build/vendor",
+    "bin-dir": ".Build/bin"
+  },
+  "scripts": {
+    "post-autoload-dump": [
+      "mkdir -p .Build/Web/typo3conf/ext/",
+      "[ -L .Build/Web/typo3conf/ext/bc_convert ] || ln -snvf ../../../../. .Build/Web/typo3conf/ext/bc_convert"
+    ]
+  },
+  "extra": {
+    "typo3/cms": {
+      "cms-package-dir": "{$vendor-dir}/typo3/cms",
+      "web-dir": ".Build/Web"
+    }
+  }
+}
