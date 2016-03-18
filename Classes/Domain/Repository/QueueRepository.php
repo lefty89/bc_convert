@@ -35,6 +35,7 @@ class QueueRepository extends Repository
 {
     /**
      * gets the next video added to queue
+     *
      * @return array|\TYPO3\CMS\Extbase\Persistence\QueryResultInterface
      */
     public function getNextItem()
@@ -60,6 +61,8 @@ class QueueRepository extends Repository
     }
 
     /**
+     * gets the position in the conversion list
+     *
      * @param \BC\BcConvert\Domain\Model\Queue $queue
      * @return int
      */
@@ -95,8 +98,9 @@ class QueueRepository extends Repository
         return 0;
     }
 
-
     /**
+     * gets an not completed query by file hash
+     *
      * @param @param string $hash
      * @return \BC\BcConvert\Domain\Model\Queue|null
      */
