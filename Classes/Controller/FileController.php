@@ -22,6 +22,7 @@ namespace BC\BcConvert\Controller;
  *  along with this script. If not, see <http://www.gnu.org/licenses/>.
  *
  ***************************************************************/
+
 use BC\BcConvert\Utility\ConvertUtility;
 use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
 use TYPO3\CMS\Extbase\Property\TypeConverter\PersistentObjectConverter;
@@ -31,161 +32,161 @@ use TYPO3\CMS\Extbase\Property\TypeConverter\PersistentObjectConverter;
  * @package TYPO3
  * @subpackage bc_convert
  */
-class FileController extends ActionController {
+class FileController extends ActionController
+{
 
-	/**
-	 * @var string
-	 */
-	protected $defaultViewObjectName = 'TYPO3\\CMS\\Extbase\\Mvc\\View\\JsonView';
+    /**
+     * @var string
+     */
+    protected $defaultViewObjectName = 'TYPO3\\CMS\\Extbase\\Mvc\\View\\JsonView';
 
-	/**
-	 * fileRepository
-	 *
-	 * @var \BC\BcConvert\Domain\Repository\FileRepository
-	 * @inject
-	 */
-	protected $fileRepository;
+    /**
+     * fileRepository
+     *
+     * @var \BC\BcConvert\Domain\Repository\FileRepository
+     * @inject
+     */
+    protected $fileRepository;
 
-	/**
-	 * queueRepository
-	 *
-	 * @var \BC\BcConvert\Domain\Repository\QueueRepository
-	 * @inject
-	 */
-	protected $queueRepository;
+    /**
+     * queueRepository
+     *
+     * @var \BC\BcConvert\Domain\Repository\QueueRepository
+     * @inject
+     */
+    protected $queueRepository;
 
-	/**
-	 * show queueState
-	 * @param string $hash
-	 */
-	public function queueStateAction($hash) {
+    /**
+     * show queueState
+     * @param string $hash
+     */
+    public function queueStateAction($hash)
+    {
+        /** @var array $output */
+        $output = array();
+        /** @var \BC\BcConvert\Domain\Model\Queue $queue */
+        $queue = $this->queueRepository->getOneQueueByFileHash($hash);
 
-		/** @var array $output */
-		$output = array();
-		/** @var \BC\BcConvert\Domain\Model\Queue $queue */
-		$queue = $this->queueRepository->getOneQueueByFileHash($hash);
+        if ($queue !== null) {
+            // file is currently converting
+            if ($queue->getFile()->getHash() === ConvertUtility::isCurrentlyConverting()) {
 
-		if ($queue !== NULL) {
-			// file is currently converting
-			if ($queue->getFile()->getHash() === ConvertUtility::isCurrentlyConverting()) {
+                // parse current converting process
+                $data = array();
+                ConvertUtility::parseCurrentProcess($data);
 
-				// parse current converting process
-				$data = array();
-				ConvertUtility::parseCurrentProcess($data);
+                // sets converting state
+                $output['state'] = "converting";
+                $output['progress'] = $data['progress'];
+                $output['duration'] = $data['duration'];
+                $output['ctime'] = $data['ctime'];
+            } else {
+                if (!$queue->getPath()) {
+                    // sets the queue position
+                    $output['state'] = "waiting";
+                    if ($output['position'] = $this->queueRepository->getQueuePosition($queue)) {
+                        // error handlnig for missing queue position
+                    }
+                } else {
+                    // if queue already had a path
+                    // its only waiting for finalisation
+                    $output['state'] = "finalize";
+                }
+            }
+        } else {
+            // show dialog for new transcoding
+            $output['state'] = "transcodeable";
+        }
 
-				// sets converting state
-				$output['state']    = "converting";
-				$output['progress'] = $data['progress'];
-				$output['duration'] = $data['duration'];
-				$output['ctime']    = $data['ctime'];
-			}
-			else {
-				if (!$queue->getPath()) {
-					// sets the queue position
-					$output['state'] = "waiting";
-					if ($output['position'] = $this->queueRepository->getQueuePosition($queue)) {
-						// error handlnig for missing queue position
-					}
-				} else {
-					// if queue already had a path
-					// its only waiting for finalisation
-					$output['state'] = "finalize";
-				}
-			}
-		}
-		else {
-			// show dialog for new transcoding
-			$output['state'] = "transcodeable";
-		}
+        $this->view->assign('value', $output);
+    }
 
-		$this->view->assign('value', $output);
-	}
+    /**
+     * action initialize convert
+     */
+    public function initializeConvertAction()
+    {
+        if (isset($this->arguments['queue'])) {
 
-	/**
-	 * action initialize convert
-	 */
-	public function initializeConvertAction()
-	{
-		if (isset($this->arguments['queue'])) {
+            /** @var array $args */
+            $args = $this->request->getArguments();
 
-			/** @var array $args */
-			$args = $this->request->getArguments();
+            // allow creating of new object
+            $propertyMappingConfiguration = $this->arguments['queue']->getPropertyMappingConfiguration();
+            $propertyMappingConfiguration->setTypeConverterOption('TYPO3\CMS\Extbase\Property\TypeConverter\PersistentObjectConverter',
+                PersistentObjectConverter::CONFIGURATION_CREATION_ALLOWED, true);
+        }
+    }
 
-			// allow creating of new object
-			$propertyMappingConfiguration = $this->arguments['queue']->getPropertyMappingConfiguration();
-			$propertyMappingConfiguration->setTypeConverterOption('TYPO3\CMS\Extbase\Property\TypeConverter\PersistentObjectConverter', PersistentObjectConverter::CONFIGURATION_CREATION_ALLOWED, TRUE);
-		}
-	}
+    /**
+     * @param string $hash
+     * @param \BC\BcConvert\Domain\Model\Queue $queue
+     */
+    public function convertAction($hash, $queue)
+    {
+        $data = array();
 
-	/**
-	 * @param string $hash
-	 * @param \BC\BcConvert\Domain\Model\Queue $queue
-	 */
-	public function convertAction($hash, $queue) {
+        /** @var \BC\BcConvert\Domain\Model\File $file */
+        $file = $this->fileRepository->findOneByHash($hash);
 
-		$data = array();
+        if ($file !== null) {
+            $queue->setFile($file);
+            $queue->setTime(new \DateTime("now"));
+            $this->queueRepository->add($queue);
 
-		/** @var \BC\BcConvert\Domain\Model\File $file */
-		$file = $this->fileRepository->findOneByHash($hash);
+            // set state
+            $data['state'] = "waiting";
+        }
 
-		if ($file !== NULL) {
-			$queue->setFile($file);
-			$queue->setTime(new \DateTime("now"));
-			$this->queueRepository->add($queue);
+        $this->view->assign('value', $data);
+    }
 
-			// set state
-			$data['state'] = "waiting";
-		}
+    /**
+     * transcodeList action
+     *
+     * @param string $hash
+     */
+    public function transcodeListAction($hash)
+    {
+        $data = array();
 
-		$this->view->assign('value', $data);
-	}
+        /** @var \BC\BcConvert\Domain\Model\File $file */
+        $file = $this->fileRepository->findOneByHash($hash);
 
-	/**
-	 * transcodeList action
-	 *
-	 * @param string $hash
-	 */
-	public function transcodeListAction($hash) {
+        if ($file !== null) {
+            $data = $this->fileRepository->getMirrorList($file);
+        }
+        $this->view->assign('value', $data);
+    }
 
-		$data = array();
+    /**
+     * creates the manifest and returns the chunk list
+     */
+    public function uploadManifestAction()
+    {
+        /** @var array $data */
+        $data = array('chunks' => array());
 
-		/** @var \BC\BcConvert\Domain\Model\File $file */
-		$file = $this->fileRepository->findOneByHash($hash);
+        // set status code
+        if (!$this->fileRepository->createManifest($data)) {
+            $this->response->setStatus(400);
+        }
+        $this->view->assign('value', $data);
+    }
 
-		if ($file !== NULL) {
-			$data = $this->fileRepository->getMirrorList($file);
-		}
-		$this->view->assign('value', $data);
-	}
+    /**
+     * uploads a new file chunk
+     */
+    public function uploadChunkAction()
+    {
+        /** @var array $data */
+        $data = array('chunks' => array());
 
-	/**
-	 * creates the manifest and returns the chunk list
-	 */
-	public function uploadManifestAction()
-	{
-		/** @var array $data */
-		$data = array('chunks' => array());
-
-		// set status code
-		if (!$this->fileRepository->createManifest($data)) {
-			$this->response->setStatus(400);
-		}
-		$this->view->assign('value', $data);
-	}
-
-	/**
-	 * uploads a new file chunk
-	 */
-	public function uploadChunkAction()
-	{
-		/** @var array $data */
-		$data = array('chunks' => array());
-
-		// set status code
-		if (!$this->fileRepository->addChunkToFile($data)) {
-			$this->response->setStatus(400);
-		}
-		$this->view->assign('value', $data);
-	}
+        // set status code
+        if (!$this->fileRepository->addChunkToFile($data)) {
+            $this->response->setStatus(400);
+        }
+        $this->view->assign('value', $data);
+    }
 
 }

@@ -31,53 +31,54 @@ use TYPO3\CMS\Extbase\Mvc\Controller\ActionController;
  * Class InfoController
  * @package BC\BcMediastream\Controller
  */
-class InfoController extends ActionController {
+class InfoController extends ActionController
+{
+    /**
+     * show action
+     */
+    public function showAction()
+    {
+        $this->addResources();
+    }
 
-	/**
-	 * show action
-	 */
-	public function showAction() {
-		$this->addResources();
-	}
+    /**
+     * adds required resources (js/css)
+     */
+    private function addResources()
+    {
+        /** @var string $extPath */
+        $extPath = ExtensionManagementUtility::siteRelPath("bc_convert") . 'Resources/Public/';
 
-	/**
-	 * adds required resources (js/css)
-	 */
-	private function addResources()
-	{
-		/** @var string $extPath */
-		$extPath = ExtensionManagementUtility::siteRelPath("bc_convert").'Resources/Public/';
+        /** @var \TYPO3\CMS\Core\Page\PageRenderer $pr */
+        $pr = $GLOBALS['TSFE']->getPageRenderer();
 
-		/** @var \TYPO3\CMS\Core\Page\PageRenderer $pr */
-		$pr = $GLOBALS['TSFE']->getPageRenderer();
+        // required css files
+        $pr->addCssFile($extPath . 'css/style.css');
 
-		// required css files
-		$pr->addCssFile($extPath.'css/style.css');
+        // add inline blobby config
+        $pr->addJsInlineCode("TYPO3_BCCONVERT_VARS", $this->getInlineConfig());
 
-		// add inline blobby config
-		$pr->addJsInlineCode("TYPO3_BCCONVERT_VARS", $this->getInlineConfig());
+        // required javascript files
+        $pr->addJsFooterFile($extPath . 'js/ui.js');
+        $pr->addJsFooterFile($extPath . 'js/main.js');
+        $pr->addJsFooterFile($extPath . 'js/circle-progress.js');
+    }
 
-		// required javascript files
-		$pr->addJsFooterFile($extPath.'js/ui.js');
-		$pr->addJsFooterFile($extPath.'js/main.js');
-		$pr->addJsFooterFile($extPath.'js/circle-progress.js');
-	}
+    /**
+     * generate inline config
+     * @return string
+     */
+    private function getInlineConfig()
+    {
+        /** @var string $resPath */
+        $resPath = '/' . ExtensionManagementUtility::siteRelPath("bc_convert") . 'Resources/Public/';
 
-	/**
-	 * generate inline config
-	 * @return string
-	 */
-	private function getInlineConfig()
-	{
-		/** @var string $resPath */
-		$resPath = '/'.ExtensionManagementUtility::siteRelPath("bc_convert").'Resources/Public/';
+        $config = array(
+            "CHUNK_URL" => "index.php?&type=165237&tx_bcconvert_file[action]=uploadChunk&tx_bcconvert_file[controller]=File",
+            "MANIFEST_URL" => "index.php?&type=165237&tx_bcconvert_file[action]=uploadManifest&tx_bcconvert_file[controller]=File",
+            "WORKER_JS" => $resPath . 'js/blob_worker.js',
+        );
 
-		$config = array(
-			"CHUNK_URL" => "index.php?&type=165237&tx_bcconvert_file[action]=uploadChunk&tx_bcconvert_file[controller]=File",
-			"MANIFEST_URL" => "index.php?&type=165237&tx_bcconvert_file[action]=uploadManifest&tx_bcconvert_file[controller]=File",
-			"WORKER_JS" => $resPath.'js/blob_worker.js',
-		);
-
-		return "TYPO3_BCCONVERT = " . json_encode($config);
-	}
+        return "TYPO3_BCCONVERT = " . json_encode($config);
+    }
 }

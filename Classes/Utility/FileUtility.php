@@ -34,238 +34,246 @@ use TYPO3\CMS\Extbase\Service\TypoScriptService;
  * @package TYPO3
  * @subpackage bc_convert
  */
-class FileUtility {
+class FileUtility
+{
+    const COMPLETE_HASH = "----------------------------------------";
 
-	const COMPLETE_HASH = "----------------------------------------";
+    /**
+     * @param string $name
+     * @param string $suffix
+     * @return string
+     */
+    public static function createTempFileInFolder($name, $suffix)
+    {
+        /** @var string $storagePath */
+        $storagePath = FileUtility::getSettings('fileStoragePath');
 
-	/**
-	 * @param string $name
-	 * @param string $suffix
-	 * @return string
-	 */
-	public static function createTempFileInFolder($name, $suffix) {
+        /** @var string $cleanName */
+        $cleanName = preg_replace('/[^a-zA-Z0-9-_\.]/', '_', $name);
 
-		/** @var string $storagePath */
-		$storagePath = FileUtility::getSettings('fileStoragePath');
+        // create folder if not existing
+        if (!is_dir($storagePath)) {
+            mkdir($storagePath, 0755, true);
+        }
 
-		/** @var string $cleanName */
-		$cleanName = preg_replace('/[^a-zA-Z0-9-_\.]/','_', $name);
+        do {
+            /** @var string $file */
+            $file = $storagePath . $cleanName . "_" . substr(str_shuffle(md5(time())), 0, 5) . "." . $suffix;
 
-		// create folder if not existing
-		if (!is_dir($storagePath)) {
-			mkdir($storagePath, 0755, true);
-		}
+            $fp = @fopen($file, 'x');
+        } while (!$fp);
 
-		do
-		{
-			/** @var string $file */
-			$file = $storagePath.$cleanName."_".substr(str_shuffle(md5(time())),0, 5).".".$suffix;
+        fclose($fp);
 
-			$fp = @fopen($file, 'x');
-		}
-		while(!$fp);
+        return $file;
+    }
 
-		fclose($fp);
-		return $file;
-	}
+    /**
+     * get full typoscript settings for this extension
+     *
+     * @param string $name
+     * @return array
+     */
+    public static function getSettings($name)
+    {
+        /** @var \TYPO3\CMS\Extbase\Object\ObjectManager $objectManager */
+        $objectManager = GeneralUtility::makeInstance(ObjectManager::class);
 
-	/**
-	 * get full typoscript settings for this extension
-	 *
-	 * @param string $name
-	 * @return array
-	 */
-	public static function getSettings($name) {
+        /** @var \TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface $configurationManager */
+        $configurationManager = $objectManager->get(ConfigurationManagerInterface::class);
 
-		/** @var \TYPO3\CMS\Extbase\Object\ObjectManager $objectManager */
-		$objectManager = GeneralUtility::makeInstance(ObjectManager::class);
+        /** @var array $typoscript */
+        $typoscript = $configurationManager->getConfiguration(
+            ConfigurationManagerInterface::CONFIGURATION_TYPE_FULL_TYPOSCRIPT,
+            'BcConvert'
+        );
 
-		/** @var \TYPO3\CMS\Extbase\Configuration\ConfigurationManagerInterface $configurationManager */
-		$configurationManager = $objectManager->get(ConfigurationManagerInterface::class);
+        /** @var \TYPO3\CMS\Extbase\Service\TypoScriptService $typoScriptService */
+        $typoScriptService = GeneralUtility::makeInstance(TypoScriptService::class);
 
-		/** @var array $typoscript */
-		$typoscript = $configurationManager->getConfiguration(
-			ConfigurationManagerInterface::CONFIGURATION_TYPE_FULL_TYPOSCRIPT,
-			'BcConvert'
-		);
+        // switch to no dot notation
+        $rawTs = $typoScriptService->convertTypoScriptArrayToPlainArray($typoscript);
 
-		/** @var \TYPO3\CMS\Extbase\Service\TypoScriptService $typoScriptService */
-		$typoScriptService = GeneralUtility::makeInstance(TypoScriptService::class);
+        return $rawTs['plugin']['tx_bcconvert']['settings'][$name];
+    }
 
-		// switch to no dot notation
-		$rawTs = $typoScriptService->convertTypoScriptArrayToPlainArray($typoscript);
+    /**
+     * @return Object
+     * @throws \Exception
+     */
+    public static function getManifest()
+    {
+        /** mixed $data */
+        if (($data = file_get_contents("php://input")) === false) {
+            throw new Exception('Input data not valid');
+        }
 
-		return $rawTs['plugin']['tx_bcconvert']['settings'][$name];
-	}
+        return ValidationUtility::parseManifest($data);
+    }
 
-	/**
-	 * @return Object
-	 * @throws \Exception
-	 */
-	public static function getManifest() {
+    /**
+     * @param Object $manifest
+     * @return string
+     */
+    public static function createPersistentFile($manifest)
+    {
+        // concat temp filename
+        $filename = FileUtility::createTempFileInFolder(pathinfo($manifest->name, PATHINFO_FILENAME),
+            pathinfo($manifest->name, PATHINFO_EXTENSION));
 
-		/** mixed $data */
-		if (($data = file_get_contents("php://input")) === FALSE)
-			throw new Exception('Input data not valid');
+        // open in write mode.
+        $fp = fopen($filename, 'w');
 
-		return ValidationUtility::parseManifest($data);
-	}
+        // lock file
+        if (flock($fp, LOCK_EX)) {
 
-	/**
-	 * @param Object $manifest
-	 * @return string
-	 */
-	public static function createPersistentFile($manifest) {
+            // write manifest
+            $man = json_encode($manifest) . PHP_EOL;
+            fwrite($fp, $man, strlen($man));
+            fflush($fp);
 
-		// concat temp filename
-		$filename = FileUtility::createTempFileInFolder(pathinfo($manifest->name, PATHINFO_FILENAME), pathinfo($manifest->name, PATHINFO_EXTENSION));
+            // buffer file size
+            $size = intval($manifest->size) + strlen($man);
 
-		// open in write mode.
-		$fp = fopen($filename, 'w');
+            // write dummy content
+            fseek($fp, $size - 1, SEEK_SET);
+            fwrite($fp, 'a');
+            fflush($fp);
+            // unlock file
+            flock($fp, LOCK_UN);
+        }
 
-		// lock file
-		if (flock($fp, LOCK_EX)) {
+        // close file
+        fclose($fp);
 
-			// write manifest
-			$man = json_encode($manifest) . PHP_EOL;
-			fwrite($fp, $man, strlen($man));
-			fflush($fp);
+        return $filename;
+    }
 
-			// buffer file size
-			$size = intval($manifest->size) + strlen($man);
+    /**
+     * @param \BC\BcConvert\Domain\Model\File $file
+     * @return Object
+     * @throws \Exception
+     */
+    public static function readFileManifest($file)
+    {
+        if (file_exists($file->getPath())) {
 
-			// write dummy content
-			fseek($fp, $size-1, SEEK_SET);
-			fwrite($fp, 'a');
-			fflush($fp);
-			// unlock file
-			flock($fp, LOCK_UN);
-		}
+            // open in read mode.
+            $fp = fopen($file->getPath(), 'r');
 
-		// close file
-		fclose($fp);
+            // read first line
+            $manifestString = fgets($fp);
 
-		return $filename;
-	}
+            fflush($fp);
 
-	/**
-	 * @param \BC\BcConvert\Domain\Model\File $file
-	 * @return Object
-	 * @throws \Exception
-	 */
-	public static function readFileManifest($file)
-	{
-		if (file_exists($file->getPath())) {
+            // close file
+            fclose($fp);
 
-			// open in read mode.
-			$fp = fopen($file->getPath(), 'r');
+            return ValidationUtility::parseManifest($manifestString);
+        } else {
+            throw new Exception('File does not exist');
+        }
+    }
 
-			// read first line
-			$manifestString = fgets($fp);
+    /**
+     * @param \BC\BcConvert\Domain\Model\File $file
+     * @return Object
+     * @throws \Exception
+     */
+    public static function addChunkToExistingFile($file)
+    {
+        /** mixed $blob */
+        if (($blob = file_get_contents("php://input")) === false) {
+            throw new Exception('Input data not valid');
+        }
 
-			fflush($fp);
+        /** @var string $sha1 */
+        $sha1 = sha1($blob);
 
-			// close file
-			fclose($fp);
+        if (file_exists($file->getPath())) {
 
-			return ValidationUtility::parseManifest($manifestString);
-		}
-		else throw new Exception('File does not exist');
-	}
+            /** @var Object $fileManifest */
+            $fileManifest = FileUtility::readFileManifest($file);
 
-	/**
-	 * @param \BC\BcConvert\Domain\Model\File $file
-	 * @return Object
-	 * @throws \Exception
-	 */
-	public static function addChunkToExistingFile($file)
-	{
-		/** mixed $blob */
-		if (($blob = file_get_contents("php://input")) === FALSE)
-			throw new Exception('Input data not valid');
+            // gets the index of the uploaded chunk
+            $idx = array_search($sha1, $fileManifest->chunks);
 
-		/** @var string $sha1 */
-		$sha1 = sha1($blob);
+            if ($idx !== false) {
+                // clear the new part in the manifest file
+                $fileManifest->chunks[$idx] = FileUtility::COMPLETE_HASH;
+                // convert manifest back to json string
+                $jsonManifest = json_encode($fileManifest) . PHP_EOL;
 
-		if (file_exists($file->getPath())) {
+                // open in wrtie mode.
+                $fp = fopen($file->getPath(), 'c+');
+                // lock file
+                if (flock($fp, LOCK_EX)) {
 
-			/** @var Object $fileManifest */
-			$fileManifest = FileUtility::readFileManifest($file);
+                    # write manifest
+                    fseek($fp, 0, SEEK_SET);
+                    fwrite($fp, $jsonManifest, strlen($jsonManifest));
+                    fflush($fp);
 
-			// gets the index of the uploaded chunk
-			$idx = array_search($sha1, $fileManifest->chunks);
+                    # write data
+                    fseek($fp, strlen($jsonManifest) + (1024 * 1024 * $idx), SEEK_SET);    // 1MB CHUNK SIZE
+                    fwrite($fp, $blob, strlen($blob));
+                    fflush($fp);
+                    // unlock file
+                    flock($fp, LOCK_UN);
+                }
 
-			if ($idx !== FALSE) {
-				// clear the new part in the manifest file
-				$fileManifest->chunks[$idx] = FileUtility::COMPLETE_HASH;
-				// convert manifest back to json string
-				$jsonManifest = json_encode($fileManifest) . PHP_EOL;
+                // close file
+                fclose($fp);
+            } else {
+                throw new Exception('Chunk was not found in manifest');
+            }
 
-				// open in wrtie mode.
-				$fp = fopen($file->getPath(), 'c+');
-				// lock file
-				if (flock($fp, LOCK_EX)) {
+            return $fileManifest;
+        } else {
+            throw new Exception('File does not exist');
+        }
+    }
 
-					# write manifest
-					fseek($fp, 0, SEEK_SET);
-					fwrite($fp, $jsonManifest, strlen($jsonManifest));
-					fflush($fp);
+    /**
+     * @param string $hash
+     * @param \BC\BcConvert\Domain\Model\File $file
+     * @return boolean
+     * @throws \Exception
+     */
+    public static function completeFile($hash, $file)
+    {
+        // remove the file manifest
+        if ($handle = fopen($file->getPath(), "c+")) {
+            if (flock($handle, LOCK_EX)) {
+                while (($line = fgets($handle)) !== false) {
+                    if (!isset($write_position)) {
+                        $write_position = 0;
+                    } else {
+                        $read_position = ftell($handle);
+                        fseek($handle, $write_position);
+                        fputs($handle, $line);
+                        fseek($handle, $read_position);
+                        $write_position += strlen($line);
+                    }
+                }
+                fflush($handle);
+                ftruncate($handle, $write_position);
+                flock($handle, LOCK_UN);
+            }
+            fclose($handle);
+        } else {
+            throw new Exception('File could not be opened');
+        }
 
-					# write data
-					fseek($fp, strlen($jsonManifest) + (1024 * 1024 * $idx), SEEK_SET);    // 1MB CHUNK SIZE
-					fwrite($fp, $blob, strlen($blob));
-					fflush($fp);
-					// unlock file
-					flock($fp, LOCK_UN);
-				}
+        // validate complete file
+        if ((is_file($file->getPath())) && ($hash == sha1_file($file->getPath()))) {
+            // mark file as complete
+            $file->setComplete(true);
+        } else {
+            throw new Exception('File is not valid');
+        }
 
-				// close file
-				fclose($fp);
-			}
-			else throw new Exception('Chunk was not found in manifest');
-
-			return $fileManifest;
-		}
-		else throw new Exception('File does not exist');
-	}
-
-	/**
-	 * @param string $hash
-	 * @param \BC\BcConvert\Domain\Model\File $file
-	 * @return boolean
-	 * @throws \Exception
-	 */
-	public static function completeFile($hash, $file)
-	{
-		// remove the file manifest
-		if ($handle = fopen($file->getPath(), "c+")) {
-			if (flock($handle, LOCK_EX)) {
-				while (($line = fgets($handle)) !== FALSE) {
-					if (!isset($write_position)) {
-						$write_position = 0;
-					} else {
-						$read_position = ftell($handle);
-						fseek($handle, $write_position);
-						fputs($handle, $line);
-						fseek($handle, $read_position);
-						$write_position += strlen($line);
-					}
-				}
-				fflush($handle);
-				ftruncate($handle, $write_position);
-				flock($handle, LOCK_UN);
-			}
-			fclose($handle);
-		}
-		else throw new Exception('File could not be opened');
-
-		// validate complete file
-		if ((is_file($file->getPath())) && ($hash == sha1_file($file->getPath()))) {
-			// mark file as complete
-			$file->setComplete(true);
-		} else throw new Exception('File is not valid');
-
-		return true;
-	}
+        return true;
+    }
 
 }

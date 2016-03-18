@@ -37,184 +37,186 @@ use TYPO3\CMS\Extbase\Persistence\Repository;
  * @package TYPO3
  * @subpackage bc_convert
  */
-class FileRepository extends Repository {
+class FileRepository extends Repository
+{
+    /**
+     * @param \BC\BcConvert\Domain\Model\Queue $queue
+     * @return boolean
+     * @throws \TYPO3\CMS\Extbase\Persistence\Exception\IllegalObjectTypeException
+     */
+    public function createFromQueue($queue)
+    {
+        /** @var string $completePath */
+        $completePath = GeneralUtility::getFileAbsFileName($queue->getPath());
 
-	/**
-	 * @param \BC\BcConvert\Domain\Model\Queue $queue
-	 * @return boolean
-	 * @throws \TYPO3\CMS\Extbase\Persistence\Exception\IllegalObjectTypeException
-	 */
-	public function createFromQueue($queue) {
+        if (is_file($completePath)) {
 
-		/** @var string $completePath */
-		$completePath = GeneralUtility::getFileAbsFileName($queue->getPath());
+            // move and rename file
+            $hash = sha1_file($completePath);
 
-		if (is_file($completePath)) {
+            $file = new File();
+            $file->setHash($hash);
 
-			// move and rename file
-			$hash = sha1_file($completePath);
+            /** @var string $filename */
+            $filename = pathinfo($queue->getFile()->getName(), PATHINFO_FILENAME) . "." . $queue->getFormat();
 
-			$file = new File();
-			$file->setHash($hash);
+            $file->setPid($queue->getFile()->getPid());
+            $file->setName($filename);
+            $file->setSize(filesize($completePath));
+            $file->setComplete(true);
 
-			/** @var string $filename */
-			$filename = pathinfo($queue->getFile()->getName(), PATHINFO_FILENAME) . "." . $queue->getFormat();
+            // get file mime
+            $finfo = finfo_open(FILEINFO_MIME_TYPE);
+            $mime = finfo_file($finfo, $completePath);
+            finfo_close($finfo);
 
-			$file->setPid($queue->getFile()->getPid());
-			$file->setName($filename);
-			$file->setSize(filesize($completePath));
-			$file->setComplete(true);
+            $file->setMime($mime);
+            $file->setPath($queue->getPath());
 
-			// get file mime
-			$finfo = finfo_open(FILEINFO_MIME_TYPE);
-			$mime = finfo_file($finfo, $completePath);
-			finfo_close($finfo);
+            $mirror = $queue->getFile()->getMirror() ?: $queue->getFile()->getUid();
+            $file->setMirror($mirror);
+            $this->add($file);
 
-			$file->setMime($mime);
-			$file->setPath($queue->getPath());
+            return true;
+        }
 
-			$mirror = $queue->getFile()->getMirror() ?: $queue->getFile()->getUid();
-			$file->setMirror($mirror);
-			$this->add($file);
+        return false;
+    }
 
-			return true;
-		}
+    /**
+     * @param array $data
+     * @param \BC\BcConvert\Domain\Model\File $file
+     */
+    private function fillMessage(&$data, $file)
+    {
+        $data = array_merge($data, array(
+            'link' => $file->getPath(),
+            'cable' => ConvertUtility::isConvertable($file),
+            'list' => array()
+        ));
 
-		return false;
-	}
+    }
 
-	/**
-	 * @param array $data
-	 * @param \BC\BcConvert\Domain\Model\File $file
-	 */
-	private function fillMessage(&$data, $file) {
+    /**
+     * @param string $path
+     * @param string $hash
+     * @param Object $manifest
+     * @return \BC\BcConvert\Domain\Model\File
+     */
+    private function createFileDbEntry($path, $hash, $manifest)
+    {
+        $file = new File();
+        $file->setHash($hash);
+        $file->setName($manifest->name);
+        $file->setSize($manifest->size);
+        $file->setMime($manifest->mime);
+        $file->setPath($path);
+        $this->add($file);
 
-		$data = array_merge($data, array(
-			'link'  => $file->getPath(),
-			'cable' => ConvertUtility::isConvertable($file),
-			'list'  => array()
-		));
+        $persistenceManager = GeneralUtility::makeInstance(PersistenceManager::class);
+        $persistenceManager->persistAll();
 
-	}
+        return $file;
+    }
 
-	/**
-	 * @param string $path
-	 * @param string $hash
-	 * @param Object $manifest
-	 * @return \BC\BcConvert\Domain\Model\File
-	 */
-	private function createFileDbEntry($path, $hash, $manifest) {
+    /**
+     * @param array $data
+     * @return boolean
+     * @throws \Exception
+     */
+    public function createManifest(&$data)
+    {
+        try {
+            /** @var Object $manifest */
+            $manifest = FileUtility::getManifest();
 
-		$file = new File();
-		$file->setHash($hash);
-		$file->setName($manifest->name);
-		$file->setSize($manifest->size);
-		$file->setMime($manifest->mime);
-		$file->setPath($path);
-		$this->add($file);
+            /** @var string $hash */
+            $hash = ValidationUtility::getFileHash();
 
-		$persistenceManager = GeneralUtility::makeInstance(PersistenceManager::class);
-		$persistenceManager->persistAll();
+            /** @var \BC\BcConvert\Domain\Model\File $file */
+            $file = $this->findOneByHash($hash);
 
-		return $file;
-	}
+            if ($file === null) {
+                // create a new file on the file system
+                $path = FileUtility::createPersistentFile($manifest);
+                // create a new file in the typo3 db
+                $this->createFileDbEntry($path, $hash, $manifest);
+                $data['chunks'] = $manifest->chunks;
+            } else {
+                if (!$file->isComplete()) {
+                    /** @var Object $fileManifest */
+                    $fileManifest = FileUtility::readFileManifest($file);
+                    $data['chunks'] = array_merge(array_diff($fileManifest->chunks, array(FileUtility::COMPLETE_HASH)));
+                } else {
+                    $this->fillMessage($data, $file);
+                }
+            }
+        } catch (Exception $e) {
+            error_log(print_r($e->getMessage(), true));
 
-	/**
-	 * @param array $data
-	 * @return boolean
-	 * @throws \Exception
-	 */
-	public function createManifest(&$data) {
+            return false;
+        }
 
-		try
-		{
-			/** @var Object $manifest */
-			$manifest = FileUtility::getManifest();
+        return true;
+    }
 
-			/** @var string $hash */
-			$hash = ValidationUtility::getFileHash();
+    /**
+     * @param array $data
+     * @return boolean
+     */
+    public function addChunkToFile(&$data)
+    {
+        try {
+            /** @var string $hash */
+            $hash = ValidationUtility::getFileHash();
 
-			/** @var \BC\BcConvert\Domain\Model\File $file */
-			$file = $this->findOneByHash($hash);
+            /** @var \BC\BcConvert\Domain\Model\File $file */
+            $file = $this->findOneByHash($hash);
 
-			if ($file === NULL) {
-				// create a new file on the file system
-				$path = FileUtility::createPersistentFile($manifest);
-				// create a new file in the typo3 db
-				$this->createFileDbEntry($path, $hash, $manifest);
-				$data['chunks'] = $manifest->chunks;
-			}
-			else if (!$file->isComplete()) {
-				/** @var Object $fileManifest */
-				$fileManifest = FileUtility::readFileManifest($file);
-				$data['chunks'] = array_merge(array_diff($fileManifest->chunks, array(FileUtility::COMPLETE_HASH)));
-			}
-			else $this->fillMessage($data, $file);
-		}
-		catch (Exception $e) {
-			error_log(print_r($e->getMessage(), TRUE));
-			return false;
-		}
+            if ($file !== null) {
+                /** @var Object $fileManifest */
+                $fileManifest = FileUtility::addChunkToExistingFile($file);
+                /** @var array $chunks */
+                $chunks = $data['chunks'] = array_merge(array_diff($fileManifest->chunks,
+                    array(FileUtility::COMPLETE_HASH)));
 
-		return true;
-	}
+                if (!count($chunks)) {
+                    // complete file upload and update path
+                    if (FileUtility::completeFile($hash, $file)) {
+                        $this->fillMessage($data, $file);
+                        $file->setMirror($file->getUid());
+                        $this->update($file);
+                    }
+                }
+            } else {
+                throw new Exception('File was not found');
+            }
+        } catch (Exception $e) {
+            error_log(print_r($e->getMessage(), true));
 
-	/**
-	 * @param array $data
-	 * @return boolean
-	 */
-	public function addChunkToFile(&$data)
-	{
-		try
-		{
-			/** @var string $hash */
-			$hash = ValidationUtility::getFileHash();
+            return false;
+        }
 
-			/** @var \BC\BcConvert\Domain\Model\File $file */
-			$file = $this->findOneByHash($hash);
+        return true;
+    }
 
-			if ($file !== null) {
-				/** @var Object $fileManifest */
-				$fileManifest = FileUtility::addChunkToExistingFile($file);
-				/** @var array $chunks */
-				$chunks = $data['chunks'] = array_merge(array_diff($fileManifest->chunks, array(FileUtility::COMPLETE_HASH)));
+    /**
+     * @param \BC\BcConvert\Domain\Model\File $file
+     * @return array
+     */
+    public function getMirrorList($file)
+    {
+        $result = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows(
+            "name, path",
+            "tx_bcconvert_domain_model_file",
+            sprintf("mirror = %d AND uid != %d",
+                $file->getMirror(),
+                $file->getUid()),
+            "",
+            "",
+            ""
+        );
 
-				if (!count($chunks)) {
-					// complete file upload and update path
-					if (FileUtility::completeFile($hash, $file)) {
-						$this->fillMessage($data, $file);
-						$file->setMirror($file->getUid());
-						$this->update($file);
-					}
-				}
-			}
-			else throw new Exception('File was not found');
-		}
-		catch (Exception $e) {
-			error_log(print_r($e->getMessage(), TRUE));
-			return false;
-		}
-
-		return true;
-	}
-
-	/**
-	 * @param \BC\BcConvert\Domain\Model\File $file
-	 * @return array
-	 */
-	public function getMirrorList($file)
-	{
-		$result = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows(
-			"name, path",
-			"tx_bcconvert_domain_model_file",
-			sprintf("mirror = %d AND uid != %d",
-				$file->getMirror(),
-				$file->getUid()),
-			"",
-			"",
-			""
-		);
-
-		return $result;
-	}
+        return $result;
+    }
 }

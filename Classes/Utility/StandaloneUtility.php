@@ -32,29 +32,29 @@ use TYPO3\CMS\Fluid\View\StandaloneView;
  * @package TYPO3
  * @subpackage bc_convert
  */
-class StandaloneUtility {
+class StandaloneUtility
+{
+    /**
+     * render template
+     *
+     * @param string $templateFile
+     * @param array $variables
+     * @return string
+     */
+    public static function renderStandaloneView($templateFile, $variables = array())
+    {
+        /** @var \TYPO3\CMS\Extbase\Object\ObjectManager $objectManager */
+        $objectManager = GeneralUtility::makeInstance(ObjectManager::class);
 
-	/**
-	 * render template
-	 *
-	 * @param string $templateFile
-	 * @param array $variables
-	 * @return string
-	 */
-	public static function renderStandaloneView($templateFile, $variables = array()) {
+        /** @var \TYPO3\CMS\Fluid\View\StandaloneView $standaloneView */
+        $standaloneView = $objectManager->get(StandaloneView::class);
 
-		/** @var \TYPO3\CMS\Extbase\Object\ObjectManager $objectManager */
-		$objectManager = GeneralUtility::makeInstance(ObjectManager::class);
+        /** @var string $templatePathAndFilename */
+        $templatePathAndFilename = GeneralUtility::getFileAbsFileName($templateFile);
 
-		/** @var \TYPO3\CMS\Fluid\View\StandaloneView $standaloneView */
-		$standaloneView = $objectManager->get(StandaloneView::class);
+        $standaloneView->setTemplatePathAndFilename($templatePathAndFilename);
+        $standaloneView->assignMultiple($variables);
 
-		/** @var string $templatePathAndFilename */
-		$templatePathAndFilename = GeneralUtility::getFileAbsFileName($templateFile);
-
-		$standaloneView->setTemplatePathAndFilename($templatePathAndFilename);
-		$standaloneView->assignMultiple($variables);
-
-		return $standaloneView->render();
-	}
+        return $standaloneView->render();
+    }
 }

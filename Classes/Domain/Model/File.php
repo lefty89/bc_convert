@@ -30,167 +30,166 @@ use TYPO3\CMS\Extbase\DomainObject\AbstractEntity;
  * @package TYPO3
  * @subpackage bc_convert
  */
-class File extends AbstractEntity {
+class File extends AbstractEntity
+{
+    /**
+     * name
+     *
+     * @var string
+     */
+    protected $name;
 
-	/**
-	 * name
-	 *
-	 * @var string
-	 */
-	protected $name;
+    /**
+     * hash
+     *
+     * @var string
+     */
+    protected $hash;
 
-	/**
-	 * hash
-	 *
-	 * @var string
-	 */
-	protected $hash;
+    /**
+     * mime
+     *
+     * @var string
+     */
+    protected $mime;
 
-	/**
-	 * mime
-	 *
-	 * @var string
-	 */
-	protected $mime;
+    /**
+     * size
+     *
+     * @var int
+     */
+    protected $size;
 
-	/**
-	 * size
-	 *
-	 * @var int
-	 */
-	protected $size;
+    /**
+     * mirror
+     *
+     * @var int
+     */
+    protected $mirror;
 
-	/**
-	 * mirror
-	 *
-	 * @var int
-	 */
-	protected $mirror;
+    /**
+     * complete
+     *
+     * @var boolean
+     */
+    protected $complete;
 
-	/**
-	 * complete
-	 *
-	 * @var boolean
-	 */
-	protected $complete;
+    /**
+     * path
+     *
+     * @var string
+     */
+    protected $path;
 
-	/**
-	 * path
-	 *
-	 * @var string
-	 */
-	protected $path;
+    /**
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
 
-	/**
-	 * @return string
-	 */
-	public function getName()
-	{
-		return $this->name;
-	}
+    /**
+     * @param string $name
+     */
+    public function setName($name)
+    {
+        $this->name = $name;
+    }
 
-	/**
-	 * @param string $name
-	 */
-	public function setName($name)
-	{
-		$this->name = $name;
-	}
+    /**
+     * @return string
+     */
+    public function getHash()
+    {
+        return $this->hash;
+    }
 
-	/**
-	 * @return string
-	 */
-	public function getHash()
-	{
-		return $this->hash;
-	}
+    /**
+     * @param string $hash
+     */
+    public function setHash($hash)
+    {
+        $this->hash = $hash;
+    }
 
-	/**
-	 * @param string $hash
-	 */
-	public function setHash($hash)
-	{
-		$this->hash = $hash;
-	}
+    /**
+     * @return string
+     */
+    public function getMime()
+    {
+        return $this->mime;
+    }
 
-	/**
-	 * @return string
-	 */
-	public function getMime()
-	{
-		return $this->mime;
-	}
+    /**
+     * @param string $mime
+     */
+    public function setMime($mime)
+    {
+        $this->mime = $mime;
+    }
 
-	/**
-	 * @param string $mime
-	 */
-	public function setMime($mime)
-	{
-		$this->mime = $mime;
-	}
+    /**
+     * @return int
+     */
+    public function getSize()
+    {
+        return $this->size;
+    }
 
-	/**
-	 * @return int
-	 */
-	public function getSize()
-	{
-		return $this->size;
-	}
+    /**
+     * @param int $size
+     */
+    public function setSize($size)
+    {
+        $this->size = $size;
+    }
 
-	/**
-	 * @param int $size
-	 */
-	public function setSize($size)
-	{
-		$this->size = $size;
-	}
+    /**
+     * @return boolean
+     */
+    public function isComplete()
+    {
+        return $this->complete;
+    }
 
-	/**
-	 * @return boolean
-	 */
-	public function isComplete()
-	{
-		return $this->complete;
-	}
+    /**
+     * @param boolean $complete
+     */
+    public function setComplete($complete)
+    {
+        $this->complete = $complete;
+    }
 
-	/**
-	 * @param boolean $complete
-	 */
-	public function setComplete($complete)
-	{
-		$this->complete = $complete;
-	}
+    /**
+     * @return string
+     */
+    public function getPath()
+    {
+        return $this->path;
+    }
 
-	/**
-	 * @return string
-	 */
-	public function getPath()
-	{
-		return $this->path;
-	}
+    /**
+     * @param string $path
+     */
+    public function setPath($path)
+    {
+        $this->path = $path;
+    }
 
-	/**
-	 * @param string $path
-	 */
-	public function setPath($path)
-	{
-		$this->path = $path;
-	}
+    /**
+     * @return int
+     */
+    public function getMirror()
+    {
+        return $this->mirror;
+    }
 
-	/**
-	 * @return int
-	 */
-	public function getMirror()
-	{
-		return $this->mirror;
-	}
-
-	/**
-	 * @param int $mirror
-	 */
-	public function setMirror($mirror)
-	{
-		$this->mirror = $mirror;
-	}
-
+    /**
+     * @param int $mirror
+     */
+    public function setMirror($mirror)
+    {
+        $this->mirror = $mirror;
+    }
 }
